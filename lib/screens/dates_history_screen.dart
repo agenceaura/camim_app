@@ -114,32 +114,7 @@ class _DatesHistoryScreenState extends State<DatesHistoryScreen> {
                           const SizedBox(height: 12),
                           Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22)),
                           const SizedBox(height: 12),
-                          if (days.isNotEmpty || location.isNotEmpty)
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(color: Colors.grey[50], borderRadius: BorderRadius.circular(12)),
-                              child: Column(
-                                children: [
-                                  if (days.isNotEmpty)
-                                    Row(
-                                      children: [
-                                        const Icon(Icons.calendar_month, color: Colors.grey, size: 16),
-                                        const SizedBox(width: 8),
-                                        Expanded(child: Text(days, style: const TextStyle(color: Colors.black87, fontSize: 14))),
-                                      ],
-                                    ),
-                                  if (days.isNotEmpty && location.isNotEmpty) const SizedBox(height: 8),
-                                  if (location.isNotEmpty)
-                                    Row(
-                                      children: [
-                                        const Icon(Icons.location_on, color: Colors.grey, size: 16),
-                                        const SizedBox(width: 8),
-                                        Expanded(child: Text(location, style: const TextStyle(color: Colors.black87, fontSize: 14))),
-                                      ],
-                                    ),
-                                ],
-                              ),
-                            ),
+
                           if (speedhive.trim().isNotEmpty) ...[
                             const SizedBox(height: 20),
                             SizedBox(
