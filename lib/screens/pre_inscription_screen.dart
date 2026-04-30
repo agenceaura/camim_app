@@ -189,7 +189,7 @@ class _PreInscriptionScreenState extends State<PreInscriptionScreen> {
                     ],
                   ),
                   const Text('Alias:', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black54, fontSize: 12)),
-                  const Text('Guillepay25', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
+                  const Text('camim2026', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
                   const SizedBox(height: 10),
                   const Text('Titular:', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black54, fontSize: 12)),
                   const Text('Francisco Guillermo de Olivera', style: TextStyle(fontSize: 14, color: Colors.black87)),

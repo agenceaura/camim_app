@@ -214,7 +214,7 @@ class _EditEventScreenState extends State<EditEventScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              // Texto de días eliminado en favor de la cuenta regresiva automática
+              _buildTextField(_daysController, 'Texto de Fechas (ej. 9 y 10 de Mayo)'),
               _buildTextField(_speedhiveController, 'Link a Speedhive (Opcional)', isRequired: false),
               const SizedBox(height: 12),
               _buildTextField(_extraInfoController, 'Información Útil / Lugar (Opcional)', isRequired: false),
