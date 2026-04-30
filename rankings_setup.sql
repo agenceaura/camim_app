@@ -122,3 +122,9 @@ INSERT INTO public.rankings (category, pilot_name, moto_number, points) VALUES
 ('Open Class', 'Adrian Mattje', 2, 20),
 ('Open Class', 'Luis Chacon', 11, 19),
 ('Open Class', 'Sandro Diaz', 93, 18);
+
+-- 5. Enlazar automáticamente los perfiles registrados con los rankings
+UPDATE public.rankings r
+SET profile_id = p.id
+FROM public.profiles p
+WHERE LOWER(TRIM(r.pilot_name)) = LOWER(TRIM(p.full_name));
