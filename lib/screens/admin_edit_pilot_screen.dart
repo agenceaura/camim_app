@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class AdminEditPilotScreen extends StatefulWidget {
   final Map<String, dynamic> profile;
@@ -139,6 +140,32 @@ class _AdminEditPilotScreenState extends State<AdminEditPilotScreen> {
               ),
               
               const SizedBox(height: 40),
+              if (widget.profile['qr_code_id'] != null && widget.profile['qr_code_id'].toString().isNotEmpty) ...[
+                const Text('CÓDIGO QR DE ACCESO', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+                const SizedBox(height: 12),
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey[200]!),
+                    ),
+                    child: Column(
+                      children: [
+                        QrImageView(
+                          data: widget.profile['qr_code_id'].toString(),
+                          version: QrVersions.auto,
+                          size: 140.0,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(widget.profile['qr_code_id'].toString(), style: const TextStyle(fontSize: 10, color: Colors.grey, letterSpacing: 1)),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 32),
+              ],
               ElevatedButton(
                 onPressed: _isLoading ? null : _saveProfile,
                 style: ElevatedButton.styleFrom(
