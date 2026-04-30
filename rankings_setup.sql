@@ -127,4 +127,4 @@ INSERT INTO public.rankings (category, pilot_name, moto_number, points) VALUES
 UPDATE public.rankings r
 SET profile_id = p.id
 FROM public.profiles p
-WHERE LOWER(TRIM(r.pilot_name)) = LOWER(TRIM(p.full_name));
+WHERE LOWER(TRIM(r.pilot_name)) = LOWER(TRIM(p.first_name || ' ' || p.last_name));
