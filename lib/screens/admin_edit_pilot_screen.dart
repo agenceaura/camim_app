@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'dart:ui' as ui;
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
+import 'dart:html' as html; // Solo para Web/PWA
 
 class AdminEditPilotScreen extends StatefulWidget {
   final Map<String, dynamic> profile;
@@ -14,6 +18,7 @@ class AdminEditPilotScreen extends StatefulWidget {
 
 class _AdminEditPilotScreenState extends State<AdminEditPilotScreen> {
   final _formKey = GlobalKey<FormState>();
+  final GlobalKey _qrKey = GlobalKey();
   bool _isLoading = false;
 
   late TextEditingController _firstNameCtrl;
@@ -144,25 +149,40 @@ class _AdminEditPilotScreenState extends State<AdminEditPilotScreen> {
                 const Text('CÓDIGO QR DE ACCESO', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
                 const SizedBox(height: 12),
                 Center(
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey[200]!),
-                    ),
-                    child: Column(
-                      children: [
-                        QrImageView(
-                          data: widget.profile['qr_code_id'].toString(),
-                          version: QrVersions.auto,
-                          size: 140.0,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(widget.profile['qr_code_id'].toString(), style: const TextStyle(fontSize: 10, color: Colors.grey, letterSpacing: 1)),
-                      ],
+                  child: RepaintBoundary(
+                    key: _qrKey,
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey[200]!),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          QrImageView(
+                            data: widget.profile['qr_code_id'].toString(),
+                            version: QrVersions.auto,
+                            size: 160.0,
+                            gapless: false,
+                            foregroundColor: Colors.black,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            widget.profile['qr_code_id'].toString(), 
+                            style: const TextStyle(fontSize: 12, color: Colors.black, fontWeight: FontWeight.bold, letterSpacing: 1)
+                          ),
+                        ],
+                      ),
                     ),
                   ),
+                ),
+                const SizedBox(height: 16),
+                TextButton.icon(
+                  onPressed: _downloadQR,
+                  icon: const Icon(Icons.download, color: Colors.blue),
+                  label: const Text('Descargar QR como Imagen', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold)),
                 ),
                 const SizedBox(height: 32),
               ],
@@ -184,16 +204,35 @@ class _AdminEditPilotScreenState extends State<AdminEditPilotScreen> {
     );
   }
 
+  Future<void> _downloadQR() async {
+    try {
+      RenderRepaintBoundary boundary = _qrKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData == null) return;
+      final pngBytes = byteData.buffer.asUint8List();
+      
+      final blob = html.Blob([pngBytes]);
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      final anchor = html.AnchorElement(href: url)
+        ..setAttribute("download", "QR_${_firstNameCtrl.text.trim()}.png")
+        ..click();
+      html.Url.revokeObjectUrl(url);
+    } catch (e) {
+      debugPrint('Error: $e');
+    }
+  }
+
   Widget _buildTextField(TextEditingController controller, String label, {bool isNumber = false}) {
     return TextFormField(
       controller: controller,
-      style: const TextStyle(color: Colors.black), // Texto negro
+      style: const TextStyle(color: Colors.black, fontWeight: FontWeight.normal), // Forzar texto negro
       keyboardType: isNumber ? TextInputType.number : TextInputType.text,
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.black54),
+        labelStyle: const TextStyle(color: Colors.black87), // Forzar etiqueta negra
         filled: true,
-        fillColor: Colors.grey[50],
+        fillColor: Colors.white, // Fondo blanco puro
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey[300]!)),
         enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey[300]!)),
         focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.black, width: 2)),

@@ -261,7 +261,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             hintText: hint ?? label,
             hintStyle: TextStyle(color: Colors.grey[400]),
             filled: true,
-            fillColor: Colors.grey[50], // Un gris muy tenue para contraste
+            fillColor: Colors.white, // Fondo blanco puro
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(color: Colors.grey[300]!),
