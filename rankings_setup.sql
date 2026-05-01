@@ -77,6 +77,7 @@ INSERT INTO public.rankings (category, pilot_name, moto_number, points) VALUES
 ('VeloNacional 200', 'jonathan bohn', 621, 44),
 ('VeloNacional 200', 'Maximo Ott', 44, 44),
 ('VeloNacional 200', 'Junior Nuñez', 18, 40),
+('VeloNacional 200', 'Rahir Custodio', 78, 38),
 
 ('VeloNacional 250', 'daimon berguer', 49, 90),
 ('VeloNacional 250', 'sandro karuchek', 32, 75),
