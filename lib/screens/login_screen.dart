@@ -165,7 +165,49 @@ class _LoginScreenState extends State<LoginScreen> {
                 'Ingresa tus credenciales para acceder a la gestión del campeonato.',
                 style: AppTheme.bodyFont(color: Colors.white70, fontSize: 16),
               ),
+              const SizedBox(height: 32),
+
+              // NUEVO: Bloque Adquirir Entrada (Guest Flow)
+              GestureDetector(
+                onTap: () => context.push('/guest_ticket'),
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: AppTheme.camimRed,
+                    border: Border.all(color: Colors.white, width: 2),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.confirmation_number, color: Colors.white, size: 32),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('¿VENÍS AL EVENTO?', style: AppTheme.dataFont(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+                            Text('ADQUIRIR ENTRADA AQUÍ', style: AppTheme.displayFont(color: Colors.white, fontSize: 18)),
+                          ],
+                        ),
+                      ),
+                      const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 16),
+                    ],
+                  ),
+                ),
+              ),
               const SizedBox(height: 40),
+
+              // Separador visual
+              Row(
+                children: [
+                  const Expanded(child: Divider(color: Colors.white10)),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Text('O INGRESA A TU CUENTA', style: AppTheme.dataFont(color: Colors.white38, fontSize: 9)),
+                  ),
+                  const Expanded(child: Divider(color: Colors.white10)),
+                ],
+              ),
+              const SizedBox(height: 32),
 
               // Campo Email
               TextField(
