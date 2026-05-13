@@ -361,7 +361,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Row(children: [const Icon(Icons.confirmation_num, color: Colors.white54, size: 20), const SizedBox(width: 12), Text('ENTRADA GENERAL', style: AppTheme.dataFont(color: Colors.white))]),
-                          Text('\$3.000', style: AppTheme.dataFont(color: Colors.white, fontSize: 16)),
+                          Text('\$8.000', style: AppTheme.dataFont(color: Colors.white, fontSize: 16)),
                         ],
                       ),
                       const Divider(height: 30, color: Colors.white12),
@@ -369,7 +369,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Row(children: [const Icon(Icons.directions_car, color: Colors.white54, size: 20), const SizedBox(width: 12), Text('ESTACIONAMIENTO', style: AppTheme.dataFont(color: Colors.white))]),
-                          Text('\$1.000', style: AppTheme.dataFont(color: Colors.white, fontSize: 16)),
+                          Text('\$5.000', style: AppTheme.dataFont(color: Colors.white, fontSize: 16)),
                         ],
                       ),
                     ],
