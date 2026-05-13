@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:table_calendar/table_calendar.dart';
+import '../theme/app_theme.dart';
 
 class AppCalendarScreen extends StatefulWidget {
   const AppCalendarScreen({super.key});
@@ -140,6 +141,20 @@ class _AppCalendarScreenState extends State<AppCalendarScreen> {
       helpText: 'SALTAR A FECHA',
       cancelText: 'CANCELAR',
       confirmText: 'IR',
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.dark().copyWith(
+            colorScheme: const ColorScheme.dark(
+              primary: AppTheme.camimRed,
+              onPrimary: Colors.white,
+              surface: AppTheme.camimInk,
+              onSurface: Colors.white,
+            ),
+            dialogBackgroundColor: AppTheme.camimInk,
+          ),
+          child: child!,
+        );
+      },
     );
     if (picked != null) {
       setState(() {
@@ -152,72 +167,79 @@ class _AppCalendarScreenState extends State<AppCalendarScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppTheme.camimInk,
       appBar: AppBar(
-        title: const Text('Calendario CAMIM', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
+        title: Text('◆ CALENDARIO', style: AppTheme.dataFont(color: Colors.white, fontSize: 16).copyWith(letterSpacing: 2)),
+        backgroundColor: AppTheme.camimInk,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           IconButton(
-            icon: const Icon(Icons.event_note, color: Colors.blue),
+            icon: const Icon(Icons.event_note, color: Colors.white),
             onPressed: _selectYear,
             tooltip: 'Ir a fecha/año',
           ),
         ],
       ),
       body: _isLoading 
-        ? const Center(child: CircularProgressIndicator())
+        ? const Center(child: CircularProgressIndicator(color: AppTheme.camimRed))
         : Column(
             children: [
               if (!_isLoading && _birthdayData.isEmpty && _raceData.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.all(24.0),
+                Padding(
+                  padding: const EdgeInsets.all(24.0),
                   child: Text(
-                    'No se encontraron eventos o cumpleaños.\nUsa el panel de administrador para registrar fechas de carrera.', 
+                    'NO SE ENCONTRARON EVENTOS.', 
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 14, color: Colors.grey, fontStyle: FontStyle.italic),
+                    style: AppTheme.dataFont(fontSize: 12, color: Colors.white54),
                   ),
                 ),
-              TableCalendar(
-                locale: 'es_ES',
-                firstDay: DateTime.utc(DateTime.now().year - 1, 1, 1),
-                lastDay: DateTime.utc(DateTime.now().year + 5, 12, 31),
-                focusedDay: _focusedDay,
-                startingDayOfWeek: StartingDayOfWeek.monday,
-                calendarFormat: _calendarFormat,
-                selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-                onDaySelected: (selectedDay, focusedDay) {
-                  setState(() {
-                    _selectedDay = selectedDay;
-                    _focusedDay = focusedDay;
-                  });
-                },
-                onFormatChanged: (format) {
-                  setState(() => _calendarFormat = format);
-                },
-                eventLoader: _getEventsForDay,
-                calendarStyle: CalendarStyle(
-                  markerDecoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-                  todayDecoration: BoxDecoration(color: Colors.red.withOpacity(0.3), shape: BoxShape.circle),
-                  selectedDecoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
-                  defaultTextStyle: const TextStyle(color: Colors.black), // Números en negro
-                  weekendTextStyle: const TextStyle(color: Colors.red), // Fines de semana en rojo
-                  outsideTextStyle: const TextStyle(color: Colors.grey),
+              Container(
+                margin: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppTheme.camimAsh,
+                  border: Border.all(color: Colors.white12),
                 ),
-                daysOfWeekStyle: const DaysOfWeekStyle(
-                  weekdayStyle: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-                  weekendStyle: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-                ),
-                headerStyle: const HeaderStyle(
-                  formatButtonVisible: false,
-                  titleCentered: true,
-                  titleTextStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black),
-                  leftChevronIcon: Icon(Icons.chevron_left, color: Colors.black),
-                  rightChevronIcon: Icon(Icons.chevron_right, color: Colors.black),
+                child: TableCalendar(
+                  locale: 'es_ES',
+                  firstDay: DateTime.utc(DateTime.now().year - 1, 1, 1),
+                  lastDay: DateTime.utc(DateTime.now().year + 5, 12, 31),
+                  focusedDay: _focusedDay,
+                  startingDayOfWeek: StartingDayOfWeek.monday,
+                  calendarFormat: _calendarFormat,
+                  selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                  onDaySelected: (selectedDay, focusedDay) {
+                    setState(() {
+                      _selectedDay = selectedDay;
+                      _focusedDay = focusedDay;
+                    });
+                  },
+                  onFormatChanged: (format) {
+                    setState(() => _calendarFormat = format);
+                  },
+                  eventLoader: _getEventsForDay,
+                  calendarStyle: CalendarStyle(
+                    markerDecoration: const BoxDecoration(color: Colors.lightBlueAccent, shape: BoxShape.rectangle),
+                    todayDecoration: BoxDecoration(color: Colors.white12, shape: BoxShape.rectangle),
+                    selectedDecoration: const BoxDecoration(color: AppTheme.camimRed, shape: BoxShape.rectangle),
+                    defaultTextStyle: AppTheme.dataFont(color: Colors.white), // Números en blanco
+                    weekendTextStyle: AppTheme.dataFont(color: AppTheme.camimRed), // Fines de semana en rojo
+                    outsideTextStyle: AppTheme.dataFont(color: Colors.white38),
+                  ),
+                  daysOfWeekStyle: DaysOfWeekStyle(
+                    weekdayStyle: AppTheme.dataFont(color: Colors.white, fontSize: 10),
+                    weekendStyle: AppTheme.dataFont(color: AppTheme.camimRed, fontSize: 10),
+                  ),
+                  headerStyle: HeaderStyle(
+                    formatButtonVisible: false,
+                    titleCentered: true,
+                    titleTextStyle: AppTheme.dataFont(fontSize: 16, color: Colors.white),
+                    leftChevronIcon: const Icon(Icons.chevron_left, color: Colors.white),
+                    rightChevronIcon: const Icon(Icons.chevron_right, color: Colors.white),
+                  ),
                 ),
               ),
-              const Divider(),
+              const Divider(color: Colors.white12),
               Expanded(
                 child: _buildDayDetails(),
               ),
@@ -230,7 +252,7 @@ class _AppCalendarScreenState extends State<AppCalendarScreen> {
     final items = _getEventsForDay(_selectedDay!);
     
     if (items.isEmpty) {
-      return const Center(child: Text('No hay eventos este día.', style: TextStyle(color: Colors.grey)));
+      return Center(child: Text('NO HAY EVENTOS ESTE DÍA.', style: AppTheme.dataFont(color: Colors.white54, fontSize: 12)));
     }
  
     return ListView.builder(
@@ -241,29 +263,33 @@ class _AppCalendarScreenState extends State<AppCalendarScreen> {
         final isBirthday = item['calendarType'] == 'birthday';
 
         if (isBirthday) {
-          final name = '${item['first_name']} ${item['last_name']}';
+          final name = '${item['first_name']} ${item['last_name']}'.toUpperCase();
           final photo = item['photo_url'];
           return Container(
             margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.grey[50],
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.grey[200]!),
+              color: AppTheme.camimAsh,
+              border: Border.all(color: Colors.white12),
             ),
             child: Row(
               children: [
-                CircleAvatar(
-                  backgroundImage: photo != null ? NetworkImage(photo) : null,
-                  child: photo == null ? const Icon(Icons.person) : null,
+                Container(
+                  width: 40, height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white10,
+                    image: photo != null ? DecorationImage(image: NetworkImage(photo), fit: BoxFit.cover) : null,
+                  ),
+                  child: photo == null ? const Icon(Icons.person, color: Colors.white30) : null,
                 ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                      const Text('¡Feliz Cumpleaños! 🎂', style: TextStyle(color: Colors.red, fontSize: 12, fontWeight: FontWeight.w600)),
+                      Text(name, style: AppTheme.dataFont(color: Colors.white, fontSize: 14)),
+                      const SizedBox(height: 4),
+                      Text('¡CUMPLEAÑOS! 🎉', style: AppTheme.dataFont(color: AppTheme.camimRed, fontSize: 10)),
                     ],
                   ),
                 ),
@@ -276,21 +302,25 @@ class _AppCalendarScreenState extends State<AppCalendarScreen> {
             margin: const EdgeInsets.only(bottom: 12),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.black,
-              borderRadius: BorderRadius.circular(16),
+              color: AppTheme.camimAsh,
+              border: const Border(left: BorderSide(color: AppTheme.camimRed, width: 4)),
             ),
             child: Row(
               children: [
-                const Icon(Icons.flag, color: Colors.white, size: 30),
+                const Icon(Icons.sports_score, color: Colors.white, size: 30),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(item['title'] ?? 'Carrera', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                      Text(item['subtitle'] ?? '', style: const TextStyle(color: Colors.red, fontSize: 12, fontWeight: FontWeight.bold)),
+                      Text(item['title']?.toString().toUpperCase() ?? 'CARRERA', style: AppTheme.dataFont(color: Colors.white, fontSize: 14)),
+                      const SizedBox(height: 4),
+                      Text(item['subtitle']?.toString().toUpperCase() ?? '', style: AppTheme.dataFont(color: AppTheme.camimRed, fontSize: 10)),
                       if (item['days_text'] != null)
-                        Text(item['days_text'], style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                        Padding(
+                          padding: const EdgeInsets.top(4.0),
+                          child: Text(item['days_text'].toString().toUpperCase(), style: AppTheme.dataFont(color: Colors.white54, fontSize: 10)),
+                        ),
                     ],
                   ),
                 ),
