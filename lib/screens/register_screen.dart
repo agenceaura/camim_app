@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../theme/app_theme.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -15,13 +16,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _nameController = TextEditingController();
   final _lastNameController = TextEditingController();
   bool _isLoading = false;
-  String _role = 'pilot'; // pilot o spectator
+  String _role = 'pilot'; // pilot, spectator o press
 
   Future<void> _register() async {
     if (_nameController.text.isEmpty || _lastNameController.text.isEmpty || 
         _emailController.text.isEmpty || _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor completa todos los campos'), backgroundColor: Colors.red),
+        const SnackBar(content: Text('Por favor completa todos los campos'), backgroundColor: AppTheme.camimRed),
       );
       return;
     }
@@ -37,15 +38,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
       final User? user = res.user;
       
       if (user != null) {
-        final uniqueQr = _role == 'pilot' ? 'CAMIM-${user.id.substring(0, 8).toUpperCase()}' : null;
+        final uniqueQr = (_role == 'pilot' || _role == 'press') ? 'CAMIM-${user.id.substring(0, 8).toUpperCase()}' : null;
         
-        // 1. Crear el perfil primero (Quitamos 'email' porque no existe la columna en el DB del usuario)
         try {
           await supabase.from('profiles').upsert({
             'id': user.id,
             'first_name': _nameController.text.trim(),
             'last_name': _lastNameController.text.trim(),
-            // 'email': _emailController.text.trim(), // Comentado para evitar error PGRST204
             if (uniqueQr != null) 'qr_code_id': uniqueQr,
             'role': _role,
           });
@@ -54,14 +53,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
           throw 'Error al guardar tus datos de perfil. Por favor, intenta ingresar con tu mail y contraseña.';
         }
 
-        // 2. Vinculación manual desde Supabase (Desactivado en app)
         if (mounted) {
           context.go('/home');
         }
       }
     } on AuthException catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error de Autenticación: ${e.message}'), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error de Autenticación: ${e.message}'), backgroundColor: AppTheme.camimRed));
       }
     } catch (e) {
       if (mounted) {
@@ -69,7 +67,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         if (msg.contains('row-level security')) {
           msg = 'Error de Permisos: Ejecuta el script SQL de políticas INSERT en Supabase.';
         }
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg), backgroundColor: AppTheme.camimRed));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -79,12 +77,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppTheme.camimInk,
       appBar: AppBar(
-        title: const Text('Crear Cuenta', style: TextStyle(color: Colors.black)),
-        backgroundColor: Colors.white,
+        title: Text('CREAR CUENTA', style: AppTheme.dataFont(color: Colors.white, fontSize: 14).copyWith(letterSpacing: 2)),
+        backgroundColor: AppTheme.camimInk,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -92,69 +90,52 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Center(
-                child: Image.asset(
-                  'assets/logo.png',
-                  height: 60,
-                  errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
-                ),
+              Text(
+                '◆ NUEVO PERFIL',
+                style: AppTheme.dataFont(color: AppTheme.camimRed, fontSize: 11).copyWith(letterSpacing: 2),
               ),
-              const SizedBox(height: 20),
-              const Text(
-                'Bienvenidos a CAMIM',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black),
+              const SizedBox(height: 12),
+              Text(
+                'BIENVENIDO\nA CAMIM.',
+                style: AppTheme.displayFont(color: Colors.white, fontSize: 42).copyWith(height: 0.9),
               ),
               const SizedBox(height: 30),
               
               // Selector de Rol Visual
+              Text('SELECCIONA TU TIPO DE ACCESO', style: AppTheme.dataFont(color: Colors.white70, fontSize: 12)),
+              const SizedBox(height: 12),
               Row(
                 children: [
                   Expanded(
-                    child: GestureDetector(
+                    child: _RoleButton(
+                      title: 'PILOTO',
+                      icon: Icons.sports_motorsports,
+                      isSelected: _role == 'pilot',
                       onTap: () => setState(() => _role = 'pilot'),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 20),
-                        decoration: BoxDecoration(
-                          color: _role == 'pilot' ? Colors.black : Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: _role == 'pilot' ? Colors.black : Colors.grey[300]!, width: 2)
-                        ),
-                        child: Column(
-                          children: [
-                            Icon(Icons.sports_motorsports, color: _role == 'pilot' ? Colors.white : Colors.grey[600], size: 36),
-                            const SizedBox(height: 12),
-                            Text('Soy Piloto', style: TextStyle(color: _role == 'pilot' ? Colors.white : Colors.black, fontWeight: FontWeight.bold, fontSize: 16)),
-                          ],
-                        ),
-                      ),
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 12),
                   Expanded(
-                    child: GestureDetector(
+                    child: _RoleButton(
+                      title: 'PRENSA',
+                      icon: Icons.camera_alt,
+                      isSelected: _role == 'press',
+                      onTap: () => setState(() => _role = 'press'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _RoleButton(
+                      title: 'ESPECTADOR',
+                      icon: Icons.groups,
+                      isSelected: _role == 'spectator',
                       onTap: () => setState(() => _role = 'spectator'),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 20),
-                        decoration: BoxDecoration(
-                          color: _role == 'spectator' ? Colors.black : Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: _role == 'spectator' ? Colors.black : Colors.grey[300]!, width: 2)
-                        ),
-                        child: Column(
-                          children: [
-                            Icon(Icons.groups, color: _role == 'spectator' ? Colors.white : Colors.grey[600], size: 36),
-                            const SizedBox(height: 12),
-                            Text('Soy Espectador', style: TextStyle(color: _role == 'spectator' ? Colors.white : Colors.black, fontWeight: FontWeight.bold, fontSize: 16)),
-                          ],
-                        ),
-                      ),
                     ),
                   ),
                 ],
               ),
               
-              const SizedBox(height: 30),
+              const SizedBox(height: 40),
               _buildField('Nombre', _nameController),
               const SizedBox(height: 16),
               _buildField('Apellido', _lastNameController),
@@ -162,20 +143,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
               _buildField('Correo electrónico', _emailController, type: TextInputType.emailAddress),
               const SizedBox(height: 16),
               _buildField('Contraseña', _passwordController, isPassword: true),
-              const SizedBox(height: 30),
+              const SizedBox(height: 40),
 
               ElevatedButton(
                 onPressed: _isLoading ? null : _register,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
+                  backgroundColor: AppTheme.camimRed,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  shape: const ContinuousRectangleBorder(),
+                  elevation: 0,
                 ),
                 child: _isLoading 
                     ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                    : const Text('Completar Registro', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                    : Text('COMPLETAR REGISTRO', style: AppTheme.dataFont(fontSize: 14)),
               ),
+              const SizedBox(height: 20),
             ],
           ),
         ),
@@ -188,15 +171,63 @@ class _RegisterScreenState extends State<RegisterScreen> {
       controller: controller,
       keyboardType: type,
       obscureText: isPassword,
-      style: const TextStyle(color: Colors.black),
+      style: AppTheme.bodyFont(color: Colors.white),
+      cursorColor: AppTheme.camimRed,
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: TextStyle(color: Colors.grey[400]),
+        hintStyle: AppTheme.bodyFont(color: Colors.white38),
         filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.grey[300]!)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Colors.black)),
+        fillColor: AppTheme.camimAsh,
+        contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+        enabledBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.zero,
+          borderSide: BorderSide(color: Colors.white12),
+        ),
+        focusedBorder: const OutlineInputBorder(
+          borderRadius: BorderRadius.zero,
+          borderSide: BorderSide(color: AppTheme.camimRed, width: 2),
+        ),
+      ),
+    );
+  }
+}
+
+class _RoleButton extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _RoleButton({
+    required this.title,
+    required this.icon,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? AppTheme.camimRed : AppTheme.camimAsh,
+          border: Border.all(color: isSelected ? AppTheme.camimRed : Colors.white12, width: 2),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: isSelected ? Colors.white : Colors.white38, size: 28),
+            const SizedBox(height: 12),
+            Text(
+              title, 
+              style: AppTheme.dataFont(color: isSelected ? Colors.white : Colors.white54, fontSize: 10),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -54,6 +54,64 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  Future<void> _forgotPassword() async {
+    final emailController = TextEditingController();
+    await showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.camimAsh,
+        title: Text('RECUPERAR CONTRASEÑA', style: AppTheme.dataFont(color: AppTheme.camimRed)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Ingresa tu correo para que el administrador pueda contactarte y blanquear tu acceso.', style: AppTheme.bodyFont(color: Colors.white70)),
+            const SizedBox(height: 16),
+            TextField(
+              controller: emailController,
+              keyboardType: TextInputType.emailAddress,
+              style: AppTheme.bodyFont(color: Colors.white),
+              decoration: InputDecoration(
+                hintText: 'usuario@correo.com',
+                hintStyle: AppTheme.bodyFont(color: Colors.white38),
+                filled: true,
+                fillColor: AppTheme.camimInk,
+                enabledBorder: const OutlineInputBorder(borderSide: BorderSide(color: Colors.white12)),
+                focusedBorder: const OutlineInputBorder(borderSide: BorderSide(color: AppTheme.camimRed)),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text('CANCELAR', style: AppTheme.dataFont(color: Colors.white38))),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.camimRed, shape: const ContinuousRectangleBorder()),
+            onPressed: () async {
+              if (emailController.text.isNotEmpty) {
+                try {
+                  await Supabase.instance.client.from('notifications').insert({
+                    'title': 'Solicitud de Contraseña',
+                    'body': 'El usuario ${emailController.text.trim()} ha solicitado blanquear su contraseña.',
+                    'type': 'alert',
+                    'target_role': 'admin',
+                  });
+                  if (mounted) {
+                    Navigator.pop(ctx);
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Notificación enviada al administrador.'), backgroundColor: Colors.green));
+                  }
+                } catch (e) {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error al enviar: $e'), backgroundColor: AppTheme.camimRed));
+                  }
+                }
+              }
+            },
+            child: Text('ENVIAR SOLICITUD', style: AppTheme.dataFont(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -155,7 +213,17 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 8),
+              
+              // Olvidé mi contraseña
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: _forgotPassword,
+                  child: Text('¿Olvidaste tu contraseña?', style: AppTheme.dataFont(color: Colors.white38, fontSize: 10)),
+                ),
+              ),
+              const SizedBox(height: 24),
 
               // Botón Continuar
               ElevatedButton(

@@ -18,6 +18,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   bool _isLoading = true;
   bool _isAdmin = false;
   bool _isOrganizer = false;
+  bool _hasNewNotifications = false;
   
   // Pilot Data
   String? _userName;
@@ -86,6 +87,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                if ((row['points'] ?? 0) > pts) p++; else break;
              }
              processedRankings.add({'category': cat, 'points': pts, 'position': p});
+           }
+
+           if (isAdmin) {
+             try {
+               final last24h = DateTime.now().subtract(const Duration(hours: 24)).toUtc().toIso8601String();
+               final recentNotifs = await Supabase.instance.client
+                   .from('notifications')
+                   .select('id')
+                   .eq('target_role', 'admin')
+                   .gte('created_at', last24h)
+                   .limit(1);
+               _hasNewNotifications = recentNotifs.isNotEmpty;
+             } catch (e) {
+               debugPrint('Error checking notifications: $e');
+             }
            }
 
            if (mounted) {
@@ -529,7 +545,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                    const SizedBox(width: 8),
                    Expanded(child: _ActionCard(icon: Icons.videocam, title: 'Vivo', color: Colors.red, onTap: () => context.push('/admin_live_event'), compact: true)),
                    const SizedBox(width: 8),
-                   Expanded(child: _ActionCard(icon: Icons.notifications_active, title: 'Notif.', color: Colors.amber, onTap: () => context.push('/admin_notifications'), compact: true)),
+                   Expanded(child: _ActionCard(icon: Icons.notifications_active, title: 'Notif.', color: Colors.amber, onTap: () => context.push('/admin_notifications'), compact: true, showBadge: _hasNewNotifications)),
                  ],
                 ),
               ],
@@ -574,8 +590,9 @@ class _ActionCard extends StatelessWidget {
   final MaterialColor color;
   final VoidCallback? onTap;
   final bool compact;
+  final bool showBadge;
 
-  const _ActionCard({required this.icon, required this.title, required this.color, this.onTap, this.compact = false});
+  const _ActionCard({required this.icon, required this.title, required this.color, this.onTap, this.compact = false, this.showBadge = false});
 
   @override
   Widget build(BuildContext context) {
@@ -602,7 +619,22 @@ class _ActionCard extends StatelessWidget {
                 color: compact ? Colors.white.withOpacity(0.1) : color.shade50, 
                 borderRadius: BorderRadius.circular(12)
               ),
-              child: Icon(icon, color: color, size: compact ? 22 : 32),
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Icon(icon, color: color, size: compact ? 22 : 32),
+                  if (showBadge)
+                    Positioned(
+                      right: -2,
+                      top: -2,
+                      child: Container(
+                        width: 10,
+                        height: 10,
+                        decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                      ),
+                    ),
+                ],
+              ),
             ),
             const SizedBox(height: 8),
             Text(
