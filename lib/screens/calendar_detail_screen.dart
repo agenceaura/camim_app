@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_map/flutter_map.dart';
 import '../widgets/countdown_widget.dart';
+import '../theme/app_theme.dart';
 
 class CalendarDetailScreen extends StatefulWidget {
   const CalendarDetailScreen({super.key});
@@ -53,19 +54,20 @@ class _CalendarDetailScreenState extends State<CalendarDetailScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return Scaffold(backgroundColor: AppTheme.camimInk, body: const Center(child: CircularProgressIndicator(color: AppTheme.camimRed)));
     }
 
     if (_eventData == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Calendario')),
+        backgroundColor: AppTheme.camimInk,
+        appBar: AppBar(title: Text('CALENDARIO', style: AppTheme.dataFont(color: Colors.white, fontSize: 16).copyWith(letterSpacing: 2)), backgroundColor: AppTheme.camimInk, iconTheme: const IconThemeData(color: Colors.white)),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.event_busy, size: 60, color: Colors.grey),
+              const Icon(Icons.event_busy, size: 60, color: Colors.white38),
               const SizedBox(height: 16),
-              const Text('No hay eventos activos programados.', style: TextStyle(fontSize: 16)),
+              Text('NO HAY EVENTOS ACTIVOS PROGRAMADOS.', style: AppTheme.dataFont(color: Colors.white54, fontSize: 12)),
               if (_isAdmin) ...[
                 const SizedBox(height: 24),
                 ElevatedButton(
@@ -73,7 +75,8 @@ class _CalendarDetailScreenState extends State<CalendarDetailScreen> {
                     final result = await context.push('/edit_event');
                     if (result == true) _loadData();
                   },
-                  child: const Text('Crear Evento Nuevo'),
+                  style: ElevatedButton.styleFrom(backgroundColor: AppTheme.camimRed, shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero)),
+                  child: Text('CREAR EVENTO NUEVO', style: AppTheme.dataFont(color: Colors.white, fontSize: 12)),
                 )
               ]
             ],
@@ -82,10 +85,10 @@ class _CalendarDetailScreenState extends State<CalendarDetailScreen> {
       );
     }
 
-    final String dateTitle = _eventData!['title'] ?? 'Sin Título';
-    final String dateSubtitle = _eventData!['subtitle'] ?? '';
-    final String days = _eventData!['days_text'] ?? '';
-    final String locationName = _eventData!['location_name'] ?? 'Ubicación no especificada';
+    final String dateTitle = _eventData!['title']?.toString().toUpperCase() ?? 'SIN TÍTULO';
+    final String dateSubtitle = _eventData!['subtitle']?.toString().toUpperCase() ?? '';
+    final String days = _eventData!['days_text']?.toString() ?? '';
+    final String locationName = _eventData!['location_name']?.toString().toUpperCase() ?? 'UBICACIÓN NO ESPECIFICADA';
     
     final double lat = (_eventData!['latitude'] as num?)?.toDouble() ?? -27.367083;
     final double lng = (_eventData!['longitude'] as num?)?.toDouble() ?? -55.896083;
@@ -106,18 +109,19 @@ class _CalendarDetailScreenState extends State<CalendarDetailScreen> {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: AppTheme.camimInk,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: CircleAvatar(
-            backgroundColor: Colors.white,
+          child: Container(
+            decoration: BoxDecoration(color: AppTheme.camimAsh, border: Border.all(color: Colors.white24)),
             child: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.black),
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
               onPressed: () => context.pop(),
+              padding: EdgeInsets.zero,
             ),
           ),
         ),
@@ -125,14 +129,15 @@ class _CalendarDetailScreenState extends State<CalendarDetailScreen> {
           if (_isAdmin)
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: CircleAvatar(
-                backgroundColor: Colors.black,
+              child: Container(
+                decoration: BoxDecoration(color: AppTheme.camimRed, border: Border.all(color: Colors.white24)),
                 child: IconButton(
                   icon: const Icon(Icons.edit, color: Colors.white, size: 20),
                   onPressed: () async {
                     final result = await context.push('/edit_event', extra: _eventData);
                     if (result == true) _loadData();
                   },
+                  padding: EdgeInsets.zero,
                 ),
               ),
             ),
@@ -162,7 +167,7 @@ class _CalendarDetailScreenState extends State<CalendarDetailScreen> {
                         point: locationLatLng,
                         width: 80,
                         height: 80,
-                        child: const Icon(Icons.location_on, color: Colors.red, size: 40.0),
+                        child: const Icon(Icons.location_on, color: AppTheme.camimRed, size: 40.0),
                       ),
                     ],
                   ),
@@ -174,11 +179,8 @@ class _CalendarDetailScreenState extends State<CalendarDetailScreen> {
               offset: const Offset(0, -20),
               child: Container(
                 decoration: const BoxDecoration(
-                  color: Color(0xFFF8F9FA),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(24),
-                    topRight: Radius.circular(24),
-                  ),
+                  color: AppTheme.camimInk,
+                  border: Border(top: BorderSide(color: AppTheme.camimRed, width: 4)),
                 ),
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
@@ -187,21 +189,21 @@ class _CalendarDetailScreenState extends State<CalendarDetailScreen> {
                     if (dateSubtitle.isNotEmpty)
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(20)),
-                        child: Text(dateSubtitle.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1)),
+                        color: AppTheme.camimRed,
+                        child: Text(dateSubtitle, style: AppTheme.dataFont(color: Colors.white, fontSize: 10).copyWith(letterSpacing: 1)),
                       ),
                     const SizedBox(height: 16),
-                    Text(dateTitle, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black)),
+                    Text(dateTitle, style: AppTheme.displayFont(fontSize: 28, color: Colors.white)),
                     const SizedBox(height: 16),
                     
                     if (_eventData!['date_start'] != null) ...[
                       Row(
                         children: [
-                          const Icon(Icons.timer_outlined, color: Colors.grey, size: 20),
+                          const Icon(Icons.timer_outlined, color: Colors.white54, size: 20),
                           const SizedBox(width: 8),
                           CountdownWidget(
                             targetDate: DateTime.tryParse(_eventData!['date_start']!),
-                            style: const TextStyle(color: Colors.black87, fontSize: 18, fontWeight: FontWeight.bold),
+                            style: AppTheme.dataFont(color: Colors.white, fontSize: 16),
                           ),
                         ],
                       ),
@@ -209,12 +211,12 @@ class _CalendarDetailScreenState extends State<CalendarDetailScreen> {
                     ],
                     Row(
                       children: [
-                        const Icon(Icons.location_on_outlined, color: Colors.grey, size: 20),
+                        const Icon(Icons.location_on_outlined, color: Colors.white54, size: 20),
                         const SizedBox(width: 8),
-                        Expanded(child: Text(locationName, style: const TextStyle(color: Colors.black87, fontSize: 16, fontWeight: FontWeight.w500))),
+                        Expanded(child: Text(locationName, style: AppTheme.dataFont(color: Colors.white, fontSize: 14))),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 24),
                     SizedBox(
                       width: double.infinity,
                       child: OutlinedButton.icon(
@@ -223,15 +225,15 @@ class _CalendarDetailScreenState extends State<CalendarDetailScreen> {
                           try {
                             await launchUrl(googleMapsUrl, mode: LaunchMode.externalApplication);
                           } catch (e) {
-                            if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No se pudo abrir Maps')));
+                            if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No se pudo abrir Maps', style: TextStyle(color: Colors.white)), backgroundColor: AppTheme.camimRed));
                           }
                         },
-                        icon: const Icon(Icons.directions, color: Colors.blue),
-                        label: const Text('Cómo llegar (Google Maps)', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold)),
+                        icon: const Icon(Icons.directions, color: Colors.lightBlueAccent),
+                        label: Text('CÓMO LLEGAR (GOOGLE MAPS)', style: AppTheme.dataFont(color: Colors.lightBlueAccent, fontSize: 12)),
                         style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Colors.blue, width: 2),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          side: const BorderSide(color: Colors.lightBlueAccent, width: 2),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                         ),
                       ),
                     ),
@@ -245,11 +247,11 @@ class _CalendarDetailScreenState extends State<CalendarDetailScreen> {
                             'eventTitle': _eventData!['title']
                           }),
                           icon: const Icon(Icons.people, color: Colors.white),
-                          label: const Text('VER LISTA DE INGRESOS', style: TextStyle(fontWeight: FontWeight.bold)),
+                          label: Text('VER LISTA DE INGRESOS', style: AppTheme.dataFont(color: Colors.white, fontSize: 12)),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue[700],
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            backgroundColor: Colors.blueAccent,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                           ),
                         ),
                       ),
@@ -257,21 +259,21 @@ class _CalendarDetailScreenState extends State<CalendarDetailScreen> {
                     
                     if (satSchedule.isNotEmpty || sunSchedule.isNotEmpty) ...[
                       const SizedBox(height: 36),
-                      const Text('Cronograma Oficial', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black)),
+                      Text('CRONOGRAMA OFICIAL', style: AppTheme.subheadFont(fontSize: 20, color: Colors.white)),
                       const SizedBox(height: 16),
                       
                       if (satSchedule.isNotEmpty) ...[
-                        _buildDayHeader('SÁBADO', Colors.blue),
+                        _buildDayHeader('SÁBADO', Colors.lightBlueAccent),
                         _buildScheduleList(satSchedule),
                         const SizedBox(height: 24),
                       ],
                       if (sunSchedule.isNotEmpty) ...[
-                         _buildDayHeader('DOMINGO', Colors.red),
+                         _buildDayHeader('DOMINGO', AppTheme.camimRed),
                         _buildScheduleList(sunSchedule),
                       ]
                     ] else ...[
                        const SizedBox(height: 32),
-                       const Text('Cronograma pendiente...', style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic)),
+                       Text('CRONOGRAMA PENDIENTE...', style: AppTheme.dataFont(color: Colors.white54, fontSize: 10)),
                     ]
                   ],
                 ),
@@ -289,12 +291,12 @@ class _CalendarDetailScreenState extends State<CalendarDetailScreen> {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
-            child: Text(day, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1)),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            color: color.withOpacity(0.1),
+            child: Text(day, style: AppTheme.dataFont(color: color, fontSize: 12).copyWith(letterSpacing: 2)),
           ),
           const SizedBox(width: 8),
-          Expanded(child: Divider(color: Colors.grey[300])),
+          Expanded(child: Divider(color: Colors.white12)),
         ],
       ),
     );
@@ -303,16 +305,15 @@ class _CalendarDetailScreenState extends State<CalendarDetailScreen> {
   Widget _buildScheduleList(List<dynamic> data) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[200]!)
+        color: AppTheme.camimAsh,
+        border: Border.all(color: Colors.white12)
       ),
       child: ListView.separated(
         padding: EdgeInsets.zero,
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: data.length,
-        separatorBuilder: (context, index) => Divider(color: Colors.grey[100], height: 1),
+        separatorBuilder: (context, index) => const Divider(color: Colors.white12, height: 1),
         itemBuilder: (context, index) {
           final item = data[index];
           return Padding(
@@ -321,11 +322,11 @@ class _CalendarDetailScreenState extends State<CalendarDetailScreen> {
               children: [
                 Container(
                   padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(color: Colors.grey[50], borderRadius: BorderRadius.circular(6)),
-                  child: Text(item['time']?.toString() ?? '', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.black)),
+                  color: Colors.white10,
+                  child: Text(item['time']?.toString() ?? '', style: AppTheme.dataFont(fontSize: 14, color: Colors.white)),
                 ),
                 const SizedBox(width: 16),
-                Expanded(child: Text(item['event']?.toString() ?? '', style: const TextStyle(color: Colors.black87, fontSize: 15))),
+                Expanded(child: Text(item['event']?.toString().toUpperCase() ?? '', style: AppTheme.dataFont(color: Colors.white70, fontSize: 12))),
               ],
             ),
           );

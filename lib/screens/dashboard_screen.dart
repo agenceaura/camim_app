@@ -492,6 +492,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Column(
                  children: [
                    _AdminSleekTile(icon: Icons.people_alt, title: 'GESTIÓN DE PILOTOS', onTap: () => context.push('/admin_pilots')),
+                   _AdminSleekTile(icon: Icons.app_registration, title: 'INSCRIPCIONES', onTap: () => context.push('/admin_inscriptions')),
                    _AdminSleekTile(icon: Icons.calendar_today, title: 'GESTIÓN DE FECHAS', onTap: () => context.push('/admin_dates_list')),
                    _AdminSleekTile(icon: Icons.videocam, title: 'CONTROL EN VIVO', onTap: () => context.push('/admin_live_event')),
                    _AdminSleekTile(icon: Icons.notifications_active, title: 'NOTIFICACIONES PUSH', onTap: () => context.push('/admin_notifications'), showBadge: _hasNewNotifications),

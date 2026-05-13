@@ -26,6 +26,7 @@ import 'screens/regulations_screen.dart';
 import 'screens/birthday_calendar_screen.dart';
 import 'screens/admin_notifications_screen.dart';
 import 'screens/admin_check_in_logs_screen.dart';
+import 'screens/admin_inscriptions_screen.dart';
 import 'services/notification_service.dart';
 
 void main() async {
@@ -157,6 +158,10 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/regulations',
       builder: (context, state) => const RegulationsScreen(),
+    ),
+    GoRoute(
+      path: '/admin_inscriptions',
+      builder: (context, state) => const AdminInscriptionsScreen(),
     ),
   ],
 );

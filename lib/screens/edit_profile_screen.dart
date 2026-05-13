@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import '../services/profile_service.dart';
+import '../theme/app_theme.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final Map<String, dynamic>? initialProfile;
@@ -106,13 +107,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ProfileService().updateProfile(updatedData);
         
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Perfil guardado con éxito'), backgroundColor: Colors.green));
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Perfil guardado con éxito', style: TextStyle(color: Colors.white)), backgroundColor: Colors.green));
           context.pop(true); // Retorna true para refrescar la pantalla anterior
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: AppTheme.camimRed));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -136,12 +137,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           setState(() {
             _photoUrl = url;
           });
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Foto subida con éxito'), backgroundColor: Colors.green));
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Foto subida con éxito', style: TextStyle(color: Colors.white)), backgroundColor: Colors.green));
         }
       }
     } catch (e) {
       debugPrint('Error picking image: $e');
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error al seleccionar imagen: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error al seleccionar imagen: $e'), backgroundColor: AppTheme.camimRed));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -175,12 +176,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppTheme.camimInk,
       appBar: AppBar(
-        title: const Text('Editar Perfil', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
+        title: Text('◆ EDITAR PERFIL', style: AppTheme.dataFont(color: Colors.white, fontSize: 16).copyWith(letterSpacing: 2)),
+        backgroundColor: AppTheme.camimInk,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -188,40 +189,45 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           children: [
             Stack(
               children: [
-                CircleAvatar(
-                  radius: 50,
-                  backgroundColor: Colors.grey[200],
-                  backgroundImage: _photoUrl != null ? NetworkImage(_photoUrl!) : null,
-                  child: _photoUrl == null ? const Icon(Icons.person, size: 60, color: Colors.grey) : (_isLoading ? const CircularProgressIndicator() : null),
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.white10,
+                    image: _photoUrl != null ? DecorationImage(image: NetworkImage(_photoUrl!), fit: BoxFit.cover) : null,
+                  ),
+                  child: _photoUrl == null ? const Icon(Icons.person, size: 60, color: Colors.white38) : (_isLoading ? const Center(child: CircularProgressIndicator(color: AppTheme.camimRed)) : null),
                 ),
                 Positioned(
-                  bottom: 0, right: 0,
+                  bottom: -8, right: -8,
                   child: Container(
-                    decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.circle),
+                    decoration: BoxDecoration(color: AppTheme.camimRed, border: Border.all(color: AppTheme.camimInk, width: 4)),
                     child: IconButton(
                       icon: const Icon(Icons.camera_alt, color: Colors.white, size: 20),
                       onPressed: _isLoading ? null : _pickImage,
+                      padding: const EdgeInsets.all(8),
+                      constraints: const BoxConstraints(),
                     )
                   )
                 )
               ],
             ),
             const SizedBox(height: 32),
-            _buildTextField('Nombre', _nameCtrl),
+            _buildTextField('NOMBRE', _nameCtrl),
             const SizedBox(height: 16),
-            _buildTextField('Apellido', _lastCtrl),
+            _buildTextField('APELLIDO', _lastCtrl),
             const SizedBox(height: 16),
-            _buildTextField('Fecha de Nacimiento', _birthdateCtrl, hint: 'Ej: 15/04/1998', type: TextInputType.number, formatters: [_DateInputFormatter()]),
+            _buildTextField('FECHA DE NACIMIENTO', _birthdateCtrl, hint: 'EJ: 15/04/1998', type: TextInputType.number, formatters: [_DateInputFormatter()]),
             const SizedBox(height: 16),
-            _buildTextField('Lugar de Nacimiento', _birthplaceCtrl, hint: 'Ej: Posadas, Misiones'),
+            _buildTextField('LUGAR DE NACIMIENTO', _birthplaceCtrl, hint: 'EJ: POSADAS, MISIONES'),
             
             if (_role == 'pilot') ...[
               const SizedBox(height: 32),
-              const Align(alignment: Alignment.centerLeft, child: Text('Datos Técnicos', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18))),
+              Align(alignment: Alignment.centerLeft, child: Text('DATOS TÉCNICOS', style: AppTheme.dataFont(color: Colors.white, fontSize: 16))),
               const SizedBox(height: 16),
-              _buildTextField('Modelo de Motocicleta / Quad', _motoCtrl, hint: 'Ej: Yamaha YZ250F'),
+              _buildTextField('MODELO DE MOTOCICLETA / QUAD', _motoCtrl, hint: 'EJ: YAMAHA YZ250F'),
               const SizedBox(height: 16),
-              _buildTextField('Número de Carrera', _numberCtrl, hint: 'Ej: 74', type: TextInputType.number),
+              _buildTextField('NÚMERO DE CARRERA', _numberCtrl, hint: 'EJ: 74', type: TextInputType.number),
             ],
             
             const SizedBox(height: 48),
@@ -230,14 +236,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _saveProfile,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
+                  backgroundColor: AppTheme.camimRed,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                 ),
                 child: _isLoading 
                     ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white))
-                    : const Text('Guardar Cambios', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    : Text('GUARDAR CAMBIOS', style: AppTheme.dataFont(color: Colors.white, fontSize: 16)),
               ),
             )
           ],
@@ -250,25 +256,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.black)),
+        Text(label, style: AppTheme.dataFont(color: Colors.white, fontSize: 12)),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
           keyboardType: type,
-          style: const TextStyle(color: Colors.black, fontSize: 16), // Texto negro visible
+          style: AppTheme.dataFont(color: Colors.white, fontSize: 14), // Texto negro visible
           inputFormatters: formatters,
           decoration: InputDecoration(
             hintText: hint ?? label,
-            hintStyle: TextStyle(color: Colors.grey[400]),
+            hintStyle: AppTheme.dataFont(color: Colors.white38, fontSize: 12),
             filled: true,
-            fillColor: Colors.white, // Fondo blanco puro
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey[300]!),
+            fillColor: AppTheme.camimAsh, // Fondo blanco puro
+            enabledBorder: const OutlineInputBorder(
+              borderRadius: BorderRadius.zero,
+              borderSide: BorderSide(color: Colors.white12),
             ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.black, width: 2),
+            focusedBorder: const OutlineInputBorder(
+              borderRadius: BorderRadius.zero,
+              borderSide: BorderSide(color: AppTheme.camimRed, width: 2),
             ),
           ),
         ),

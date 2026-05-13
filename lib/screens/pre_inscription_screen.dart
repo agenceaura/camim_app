@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter/services.dart'; // Añadido para copiar al portapapeles
+import 'package:flutter/services.dart';
 import '../widgets/countdown_widget.dart';
+import '../theme/app_theme.dart';
 
 class PreInscriptionScreen extends StatefulWidget {
   const PreInscriptionScreen({super.key});
@@ -87,17 +88,17 @@ class _PreInscriptionScreenState extends State<PreInscriptionScreen> {
     // Verificar que tengo nombre real
     final nombre = _pilotProfile!['first_name']?.toString() ?? '';
     if (nombre.isEmpty || nombre.contains('invitado')) {
-       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Por favor, completa tus datos en tu Perfil antes de inscribirte.'), backgroundColor: Colors.red));
+       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Por favor, completa tus datos en tu Perfil antes de inscribirte.'), backgroundColor: AppTheme.camimRed));
        return;
     }
 
     if (_selectedCategories.isEmpty) {
-       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Seleccioná al menos una categoría.'), backgroundColor: Colors.red));
+       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Seleccioná al menos una categoría.'), backgroundColor: AppTheme.camimRed));
        return;
     }
 
     if (_dniCtrl.text.isEmpty || _phoneCtrl.text.isEmpty) {
-       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('DNI y Teléfono son obligatorios.'), backgroundColor: Colors.red));
+       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('DNI y Teléfono son obligatorios.'), backgroundColor: AppTheme.camimRed));
        return;
     }
 
@@ -124,6 +125,14 @@ class _PreInscriptionScreenState extends State<PreInscriptionScreen> {
             }, onConflict: 'event_id, pilot_id, category');
       }
       
+      // Enviar notificación al admin (opcional, extra a lo guardado en tabla)
+      await Supabase.instance.client.from('notifications').insert({
+        'title': 'NUEVA INSCRIPCIÓN',
+        'body': '${nombre.toUpperCase()} SE HA INSCRIPTO ($paymentMethod)',
+        'type': 'info',
+        'target_role': 'admin',
+      });
+
       // 2. Acciones visuales post-guardado dependientes del método
       if (paymentMethod == 'mercadopago') {
          // TODO: Integrar lógica o SDK real de MP. Por ahora, lanzar URL falsa.
@@ -150,54 +159,52 @@ class _PreInscriptionScreenState extends State<PreInscriptionScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Row(
+        backgroundColor: AppTheme.camimAsh,
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+        title: Row(
           children: [
-            Icon(Icons.account_balance, color: Colors.black),
-            SizedBox(width: 8),
-            Text('Transferencia', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Icon(Icons.account_balance, color: Colors.white),
+            const SizedBox(width: 8),
+            Text('TRANSFERENCIA', style: AppTheme.displayFont(color: Colors.white, fontSize: 20)),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Realiza el pago a la siguiente cuenta de CAMIM:', style: TextStyle(color: Colors.black87)),
+            Text('REALIZA EL PAGO A LA SIGUIENTE CUENTA:', style: AppTheme.dataFont(color: Colors.white70, fontSize: 10)),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(8)),
+              decoration: BoxDecoration(color: Colors.white10, border: Border.all(color: Colors.white24)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Banco / App:', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black54, fontSize: 12)),
-                  const Text('AstroPay', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
-                  const SizedBox(height: 10),
-                  const Text('CVU:', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black54, fontSize: 12)),
+                  Text('CVU:', style: AppTheme.dataFont(color: Colors.white54, fontSize: 10)),
                   Row(
                     children: [
-                      const Expanded(
-                        child: Text('0000184305010023364563', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black)),
+                      Expanded(
+                        child: Text('0000177500096850511159', style: AppTheme.dataFont(color: Colors.white, fontSize: 14)),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.copy, size: 18, color: Colors.blue),
+                        icon: const Icon(Icons.copy, size: 18, color: Colors.blueAccent),
                         onPressed: () {
-                          Clipboard.setData(const ClipboardData(text: '0000184305010023364563'));
-                          ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('CVU copiado'), duration: Duration(seconds: 1)));
+                          Clipboard.setData(const ClipboardData(text: '0000177500096850511159'));
+                          ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text('CVU copiado', style: TextStyle(color: Colors.white)), backgroundColor: Colors.blueAccent, duration: Duration(seconds: 1)));
                         },
                       )
                     ],
                   ),
-                  const Text('Alias:', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black54, fontSize: 12)),
-                  const Text('camim2026', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
+                  Text('ALIAS:', style: AppTheme.dataFont(color: Colors.white54, fontSize: 10)),
+                  Text('camim2027', style: AppTheme.dataFont(color: Colors.white, fontSize: 14)),
                   const SizedBox(height: 10),
-                  const Text('Titular:', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black54, fontSize: 12)),
-                  const Text('Francisco Guillermo de Olivera', style: TextStyle(fontSize: 14, color: Colors.black87)),
+                  Text('TITULAR:', style: AppTheme.dataFont(color: Colors.white54, fontSize: 10)),
+                  Text('FRANCIS AUGUSTO DE OLIVERA', style: AppTheme.dataFont(color: Colors.white, fontSize: 12)),
                 ],
               ),
             ),
             const SizedBox(height: 16),
-            const Text('Una vez transferido, tu inscripción quedará como "Pendiente". Envía el comprobante por WhatsApp.', style: TextStyle(fontSize: 12, color: Colors.black45)),
+            Text('UNA VEZ TRANSFERIDO, TU INSCRIPCIÓN QUEDARÁ COMO "PENDIENTE". ENVÍA EL COMPROBANTE POR WHATSAPP.', style: AppTheme.dataFont(color: Colors.white54, fontSize: 10)),
           ],
         ),
         actions: [
@@ -207,7 +214,7 @@ class _PreInscriptionScreenState extends State<PreInscriptionScreen> {
                context.pop(); // Volver al inicio
                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Inscripción Pendiente Registrada', style: TextStyle(color: Colors.white)), backgroundColor: Colors.green));
             },
-            child: const Text('Entendido, volver'),
+            child: Text('ENTENDIDO, VOLVER', style: AppTheme.dataFont(color: AppTheme.camimRed)),
           ),
         ],
       )
@@ -238,29 +245,31 @@ class _PreInscriptionScreenState extends State<PreInscriptionScreen> {
     return '\$$formatted';
   }
 
+  @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return Scaffold(backgroundColor: AppTheme.camimInk, body: const Center(child: CircularProgressIndicator(color: AppTheme.camimRed)));
     }
 
     if (_activeEvent == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Pre-Inscripción')),
-        body: const Center(child: Text('No hay eventos activos')),
+        backgroundColor: AppTheme.camimInk,
+        appBar: AppBar(title: Text('PRE-INSCRIPCIÓN', style: AppTheme.dataFont(color: Colors.white, fontSize: 16).copyWith(letterSpacing: 2)), backgroundColor: AppTheme.camimInk, iconTheme: const IconThemeData(color: Colors.white)),
+        body: Center(child: Text('NO HAY EVENTOS ACTIVOS', style: AppTheme.dataFont(color: Colors.white54))),
       );
     }
 
-    final String fullName = '${_pilotProfile?['first_name'] ?? 'Piloto'} ${_pilotProfile?['last_name'] ?? ''}';
-    final String pilotMoto = '${_pilotProfile?['motorcycle_model'] ?? 'No especificada'}';
+    final String fullName = '${_pilotProfile?['first_name'] ?? 'PILOTO'} ${_pilotProfile?['last_name'] ?? ''}'.toUpperCase();
+    final String pilotMoto = '${_pilotProfile?['motorcycle_model'] ?? 'NO ESPECIFICADA'}'.toUpperCase();
     final String pilotNumber = '${_pilotProfile?['racing_number'] ?? '??'}';
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppTheme.camimInk,
       appBar: AppBar(
-        title: const Text('Inscripción Oficial', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        elevation: 1,
-        iconTheme: const IconThemeData(color: Colors.black),
+        title: Text('◆ INSCRIPCIÓN OFICIAL', style: AppTheme.dataFont(color: Colors.white, fontSize: 16).copyWith(letterSpacing: 2)),
+        backgroundColor: AppTheme.camimInk,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -271,8 +280,8 @@ class _PreInscriptionScreenState extends State<PreInscriptionScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.circular(16)
+                color: AppTheme.camimAsh,
+                border: const Border(left: BorderSide(color: AppTheme.camimRed, width: 4)),
               ),
               child: Row(
                 children: [
@@ -282,11 +291,12 @@ class _PreInscriptionScreenState extends State<PreInscriptionScreen> {
                      child: Column(
                        crossAxisAlignment: CrossAxisAlignment.start,
                        children: [
-                         Text(_activeEvent!['title'] ?? '', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
-                          CountdownWidget(
-                            targetDate: DateTime.tryParse(_activeEvent!['date_start'] ?? ''),
-                            style: const TextStyle(color: Colors.grey, fontSize: 13),
-                          ),
+                         Text(_activeEvent!['title']?.toString().toUpperCase() ?? '', style: AppTheme.displayFont(color: Colors.white, fontSize: 18)),
+                         const SizedBox(height: 4),
+                         CountdownWidget(
+                           targetDate: DateTime.tryParse(_activeEvent!['date_start'] ?? ''),
+                           style: AppTheme.dataFont(color: Colors.white54, fontSize: 12),
+                         ),
                        ],
                      )
                    )
@@ -295,28 +305,28 @@ class _PreInscriptionScreenState extends State<PreInscriptionScreen> {
             ),
             
             const SizedBox(height: 32),
-            const Text('Revisión de Datos', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text('REVISIÓN DE DATOS', style: AppTheme.subheadFont(color: Colors.white, fontSize: 18)),
             const SizedBox(height: 8),
-            const Text('Estos datos se envían a la torre de control.', style: TextStyle(color: Colors.grey, fontSize: 14)),
+            Text('ESTOS DATOS SE ENVÍAN A LA TORRE DE CONTROL.', style: AppTheme.dataFont(color: Colors.white54, fontSize: 10)),
             const SizedBox(height: 16),
             
-            _InfoRow(label: 'Piloto', value: fullName),
-            const Divider(),
-            _InfoRow(label: 'Moto/Quad', value: pilotMoto),
-            const Divider(),
-            _InfoRow(label: 'N° Carrera', value: '#$pilotNumber'),
-            const SizedBox(height: 16),
+            _InfoRow(label: 'PILOTO', value: fullName),
+            const Divider(color: Colors.white12),
+            _InfoRow(label: 'MOTO/QUAD', value: pilotMoto),
+            const Divider(color: Colors.white12),
+            _InfoRow(label: 'N° CARRERA', value: '#$pilotNumber'),
+            const SizedBox(height: 24),
             
-            _buildMandatoryField('DNI (Obligatorio)', _dniCtrl, Icons.badge_outlined, TextInputType.number),
+            _buildMandatoryField('DNI (OBLIGATORIO)', _dniCtrl, Icons.badge_outlined, TextInputType.number),
             const SizedBox(height: 12),
-            _buildMandatoryField('Teléfono de Contacto', _phoneCtrl, Icons.phone_android, TextInputType.phone),
+            _buildMandatoryField('TELÉFONO DE CONTACTO', _phoneCtrl, Icons.phone_android, TextInputType.phone),
             const SizedBox(height: 12),
-            _buildMandatoryField('Localidad', _locationCtrl, Icons.location_on_outlined, TextInputType.text),
+            _buildMandatoryField('LOCALIDAD', _locationCtrl, Icons.location_on_outlined, TextInputType.text),
             
             const SizedBox(height: 32),
-            const Text('Categorías a Inscribirse', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 4),
-            Text('Podés seleccionar más de una. Siempre pagás el precio mayor.', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+            Text('CATEGORÍAS A INSCRIBIRSE', style: AppTheme.subheadFont(color: Colors.white, fontSize: 18)),
+            const SizedBox(height: 8),
+            Text('PODÉS SELECCIONAR MÁS DE UNA. SIEMPRE PAGÁS EL PRECIO MAYOR.', style: AppTheme.dataFont(color: Colors.white54, fontSize: 10)),
             const SizedBox(height: 16),
             
             Wrap(
@@ -326,72 +336,73 @@ class _PreInscriptionScreenState extends State<PreInscriptionScreen> {
                 final isSelected = _selectedCategories.contains(entry.key);
                 final price = _isBonificado ? entry.value['bonus']! : entry.value['general']!;
                 return FilterChip(
-                  label: Text('${entry.key}\n$price', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isSelected ? Colors.white : Colors.black)),
+                  label: Text('${entry.key.toUpperCase()}\n$price', style: AppTheme.dataFont(fontSize: 10, color: isSelected ? Colors.white : Colors.white70)),
                   selected: isSelected,
                   onSelected: (val) => setState(() {
                     if (val) _selectedCategories.add(entry.key);
                     else _selectedCategories.remove(entry.key);
                   }),
-                  selectedColor: Colors.black,
-                  backgroundColor: Colors.grey[100],
+                  selectedColor: AppTheme.camimRed,
+                  backgroundColor: AppTheme.camimAsh,
                   checkmarkColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: isSelected ? Colors.black : Colors.grey[300]!)),
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide(color: isSelected ? AppTheme.camimRed : Colors.white12)),
                 );
               }).toList(),
             ),
 
             // Resumen de precio en tiempo real
             if (_selectedCategories.isNotEmpty) ...[
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [Color(0xFF1A1A1A), Color(0xFF333333)]),
-                  borderRadius: BorderRadius.circular(16),
+                  color: AppTheme.camimAsh,
+                  border: Border.all(color: Colors.white12),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.receipt_long, color: Colors.white70, size: 20),
-                    const SizedBox(width: 12),
+                    const Icon(Icons.receipt_long, color: Colors.white54, size: 24),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(_selectedCategories.join(' + '), style: const TextStyle(color: Colors.white70, fontSize: 11)),
-                          const Text('Total a pagar:', style: TextStyle(color: Colors.white, fontSize: 12)),
+                          Text(_selectedCategories.join(' + ').toUpperCase(), style: AppTheme.dataFont(color: Colors.white54, fontSize: 10)),
+                          const SizedBox(height: 4),
+                          Text('TOTAL A PAGAR:', style: AppTheme.dataFont(color: Colors.white, fontSize: 12)),
                         ],
                       ),
                     ),
-                    Text(_getTotalPriceDisplay(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 22)),
+                    Text(_getTotalPriceDisplay(), style: AppTheme.displayFont(color: Colors.white, fontSize: 24)),
                     if (_isBonificado) ...[
                       const SizedBox(width: 8),
-                      Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3), decoration: BoxDecoration(color: Colors.green, borderRadius: BorderRadius.circular(6)), child: const Text('BONUS', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold))),
+                      Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4), color: Colors.greenAccent.withOpacity(0.1), child: Text('BONUS', style: AppTheme.dataFont(color: Colors.greenAccent, fontSize: 10))),
                     ],
                   ],
                 ),
               ),
             ],
 
-            const Text('Método de Pago', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 32),
+            Text('MÉTODO DE PAGO', style: AppTheme.subheadFont(color: Colors.white, fontSize: 18)),
             const SizedBox(height: 16),
             
-            const SizedBox(height: 12),
-
             // Boton Efectivo
             ElevatedButton(
               onPressed: () => _processInscription('efectivo'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green[700],
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                backgroundColor: Colors.green,
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                 elevation: 0,
               ),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.attach_money, color: Colors.white, size: 20),
-                  SizedBox(width: 12),
-                  Text('PAGAR EN EFECTIVO', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                  const Icon(Icons.attach_money, color: Colors.white, size: 20),
+                  const SizedBox(width: 12),
+                  Text('PAGAR EN EFECTIVO', style: AppTheme.dataFont(color: Colors.white, fontSize: 14)),
                 ],
               ),
             ),
@@ -402,16 +413,16 @@ class _PreInscriptionScreenState extends State<PreInscriptionScreen> {
             OutlinedButton(
               onPressed: () => _processInscription('transfer'),
               style: OutlinedButton.styleFrom(
-                side: BorderSide(color: Colors.grey[300]!, width: 2),
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                side: const BorderSide(color: Colors.white24, width: 2),
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.account_balance, color: Colors.black, size: 20),
-                  SizedBox(width: 12),
-                  Text('TRANSFERENCIA BANCARIA', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 13)),
+                  const Icon(Icons.account_balance, color: Colors.white, size: 20),
+                  const SizedBox(width: 12),
+                  Text('TRANSFERENCIA BANCARIA', style: AppTheme.dataFont(color: Colors.white, fontSize: 14)),
                 ],
               ),
             ),
@@ -426,20 +437,20 @@ class _PreInscriptionScreenState extends State<PreInscriptionScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey)),
+        Text(label, style: AppTheme.dataFont(color: Colors.white54, fontSize: 10)),
         const SizedBox(height: 6),
         TextField(
           controller: ctrl,
           keyboardType: type,
-          style: const TextStyle(color: Colors.black, fontSize: 16), // Texto negro
+          style: AppTheme.dataFont(color: Colors.white, fontSize: 14),
           decoration: InputDecoration(
-            prefixIcon: Icon(icon, size: 20, color: Colors.grey),
+            prefixIcon: Icon(icon, size: 20, color: Colors.white54),
             filled: true,
-            fillColor: Colors.grey[100],
+            fillColor: AppTheme.camimAsh,
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey[200]!)),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey[200]!)),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.black, width: 2)),
+            border: const OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: Colors.white12)),
+            enabledBorder: const OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: Colors.white12)),
+            focusedBorder: const OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppTheme.camimRed, width: 2)),
           ),
         ),
       ],
@@ -459,8 +470,8 @@ class _InfoRow extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(color: Colors.grey, fontSize: 16)),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          Text(label, style: AppTheme.dataFont(color: Colors.white54, fontSize: 12)),
+          Text(value, style: AppTheme.dataFont(color: Colors.white, fontSize: 14)),
         ],
       ),
     );
