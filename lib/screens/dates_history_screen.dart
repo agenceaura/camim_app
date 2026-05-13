@@ -112,7 +112,10 @@ class _DatesHistoryScreenState extends State<DatesHistoryScreen> {
                             ],
                           ),
                           const SizedBox(height: 12),
-                          Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22)),
+                          Text(
+                            title, 
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22, color: Colors.black)
+                          ),
                           const SizedBox(height: 12),
 
                           if (speedhive.trim().isNotEmpty) ...[

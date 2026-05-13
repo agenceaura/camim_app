@@ -134,10 +134,10 @@ class _AdminEditPilotScreenState extends State<AdminEditPilotScreen> {
                   enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey[300]!)),
                 ),
                 items: const [
-                  DropdownMenuItem(value: 'spectator', child: Text('Espectador (No corre)')),
-                  DropdownMenuItem(value: 'pilot', child: Text('Piloto (Compite)')),
-                  DropdownMenuItem(value: 'organizer', child: Text('Organizador (Escanea QR)')),
-                  DropdownMenuItem(value: 'admin', child: Text('Administrador (Acceso total)')),
+                  DropdownMenuItem(value: 'spectator', child: Text('Espectador (No corre)', style: TextStyle(color: Colors.black))),
+                  DropdownMenuItem(value: 'pilot', child: Text('Piloto (Compite)', style: TextStyle(color: Colors.black))),
+                  DropdownMenuItem(value: 'organizer', child: Text('Organizador (Escanea QR)', style: TextStyle(color: Colors.black))),
+                  DropdownMenuItem(value: 'admin', child: Text('Administrador (Acceso total)', style: TextStyle(color: Colors.black))),
                 ],
                 onChanged: (val) {
                   if (val != null) setState(() => _selectedRole = val);

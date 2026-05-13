@@ -144,9 +144,16 @@ class _AdminPilotsListScreenState extends State<AdminPilotsListScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(name.isEmpty ? 'Sin Nombre' : _formatName(name), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                                  Text(
+                                    name.isEmpty ? 'Sin Nombre' : _formatName(name), 
+                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black)
+                                  ),
                                   const SizedBox(height: 4),
-                                  if (moto.isNotEmpty) Text(moto, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+                                  if (moto.isNotEmpty) 
+                                    Text(
+                                      moto, 
+                                      style: TextStyle(color: Colors.grey[600], fontSize: 13)
+                                    ),
                                 ],
                               )
                             ),

@@ -96,7 +96,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.backgroundWhite,
+        backgroundColor: AppTheme.camimPaper,
         icon: photoUrl != null 
           ? CircleAvatar(radius: 40, backgroundImage: NetworkImage(photoUrl))
           : Icon(success ? Icons.check_circle : Icons.cancel, color: bgColor, size: 80),
@@ -158,7 +158,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
           ),
           
           if (_isProcessing)
-            Container(color: Colors.black87, child: const Center(child: CircularProgressIndicator(color: AppTheme.primaryRed))),
+            Container(color: Colors.black87, child: const Center(child: CircularProgressIndicator(color: AppTheme.camimRed))),
             
           if (_activeEventId == null && !_isProcessing)
             Container(
@@ -181,7 +181,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
                 width: 250,
                 height: 250,
                 decoration: BoxDecoration(
-                  border: Border.all(color: AppTheme.primaryRed, width: 4),
+                  border: Border.all(color: AppTheme.camimRed, width: 4),
                   borderRadius: BorderRadius.circular(20),
                 ),
               ),

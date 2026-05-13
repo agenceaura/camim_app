@@ -137,11 +137,32 @@ class _AdminLiveEventScreenState extends State<AdminLiveEventScreen> {
               ),
               
               const SizedBox(height: 16),
-              TextField(controller: m1Controller, decoration: const InputDecoration(labelText: 'Resultados Manga 1 (ej. 1° Tulio, 2° Badiali)')),
+              TextField(
+                controller: m1Controller, 
+                style: const TextStyle(color: Colors.black),
+                decoration: const InputDecoration(
+                  labelText: 'Resultados Manga 1 (ej. 1° Tulio, 2° Badiali)',
+                  labelStyle: TextStyle(color: Colors.grey),
+                )
+              ),
               const SizedBox(height: 12),
-              TextField(controller: m2Controller, decoration: const InputDecoration(labelText: 'Resultados Manga 2')),
+              TextField(
+                controller: m2Controller, 
+                style: const TextStyle(color: Colors.black),
+                decoration: const InputDecoration(
+                  labelText: 'Resultados Manga 2',
+                  labelStyle: TextStyle(color: Colors.grey),
+                )
+              ),
               const SizedBox(height: 12),
-              TextField(controller: totalController, decoration: const InputDecoration(labelText: 'Puntos Totales / Podio')),
+              TextField(
+                controller: totalController, 
+                style: const TextStyle(color: Colors.black),
+                decoration: const InputDecoration(
+                  labelText: 'Puntos Totales / Podio',
+                  labelStyle: TextStyle(color: Colors.grey),
+                )
+              ),
               
               const SizedBox(height: 24),
               ElevatedButton(
@@ -190,9 +211,12 @@ class _AdminLiveEventScreenState extends State<AdminLiveEventScreen> {
                     final bool hasData = res.containsKey('id');
                     
                     return ListTile(
-                      title: Text(cat, style: const TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: Text(hasData ? 'Estado: ${res['status']} | Activo: ${res['is_active']}' : 'Sin datos en vivo'),
-                      trailing: const Icon(Icons.edit_outlined),
+                      title: Text(cat, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
+                      subtitle: Text(
+                        hasData ? 'Estado: ${res['status']} | Activo: ${res['is_active']}' : 'Sin datos en vivo',
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
+                      trailing: const Icon(Icons.edit_outlined, color: Colors.black54),
                       onTap: () => _showEditSheet(cat),
                     );
                   },

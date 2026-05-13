@@ -88,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.warning_amber_rounded, size: 60, color: AppTheme.primaryRed),
+                const Icon(Icons.warning_amber_rounded, size: 60, color: AppTheme.camimRed),
                 const SizedBox(height: 20),
                 const Text('Hubo un problema con tu perfil de la base de datos.', textAlign: TextAlign.center),
                 const SizedBox(height: 10),
@@ -100,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 30),
                 ElevatedButton(onPressed: _loadProfile, child: const Text('Reintentar de Nuevo')),
                 const SizedBox(height: 10),
-                TextButton(onPressed: _logout, child: const Text('Cerrar sesión', style: TextStyle(color: AppTheme.primaryBlue))),
+                TextButton(onPressed: _logout, child: const Text('Cerrar sesión', style: TextStyle(color: AppTheme.camimBlue))),
               ],
             ),
           ),

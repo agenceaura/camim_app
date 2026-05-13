@@ -10,6 +10,7 @@ class RankingScreen extends StatefulWidget {
 
 class _RankingScreenState extends State<RankingScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  final TextEditingController _searchController = TextEditingController();
   
   final List<String> _categories = [
     'MX 2', 'Open Class', 'MX 3 (Principiantes)', 'Juniors', 
@@ -19,6 +20,7 @@ class _RankingScreenState extends State<RankingScreen> with SingleTickerProvider
   ];
 
   Map<String, List<Map<String, dynamic>>> _rankingsByCat = {};
+  Map<String, List<Map<String, dynamic>>> _filteredRankingsByCat = {};
   bool _isLoading = true;
 
   @override
@@ -28,6 +30,7 @@ class _RankingScreenState extends State<RankingScreen> with SingleTickerProvider
     _tabController.addListener(() {
       if (!_tabController.indexIsChanging) {
         _loadRankingsForCategory(_categories[_tabController.index]);
+        _searchController.clear();
       }
     });
     _loadRankingsForCategory(_categories[0]);
@@ -36,11 +39,15 @@ class _RankingScreenState extends State<RankingScreen> with SingleTickerProvider
   @override
   void dispose() {
     _tabController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
   Future<void> _loadRankingsForCategory(String category) async {
-    if (_rankingsByCat.containsKey(category)) return; // Evitar recargas innecesarias
+    if (_rankingsByCat.containsKey(category)) {
+      setState(() => _filteredRankingsByCat[category] = _rankingsByCat[category]!);
+      return;
+    }
 
     setState(() => _isLoading = true);
     try {
@@ -73,6 +80,7 @@ class _RankingScreenState extends State<RankingScreen> with SingleTickerProvider
       if (mounted) {
         setState(() {
           _rankingsByCat[category] = rankingsWithPhotos;
+          _filteredRankingsByCat[category] = rankingsWithPhotos;
           _isLoading = false;
         });
       }
@@ -82,48 +90,79 @@ class _RankingScreenState extends State<RankingScreen> with SingleTickerProvider
     }
   }
 
+  void _filterRankings(String query) {
+    final currentCat = _categories[_tabController.index];
+    if (query.isEmpty) {
+      setState(() => _filteredRankingsByCat[currentCat] = _rankingsByCat[currentCat]!);
+      return;
+    }
+
+    final q = query.toLowerCase();
+    setState(() {
+      _filteredRankingsByCat[currentCat] = _rankingsByCat[currentCat]!.where((r) {
+        final name = (r['pilot_name'] ?? '').toString().toLowerCase();
+        final number = (r['moto_number'] ?? '').toString().toLowerCase();
+        return name.contains(q) || number.contains(q);
+      }).toList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        title: const Text('CAMPEONATO 2026', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: 1)),
+        title: const Text('RANKING 2026', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: 1.5)),
         backgroundColor: Colors.white,
         centerTitle: true,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(48),
-          child: Container(
-            color: Colors.grey[50], // Fondo sutil para crear contraste
-            child: TabBar(
-              controller: _tabController,
-              isScrollable: true,
-              indicatorColor: Colors.red,
-              indicatorWeight: 3,
-              labelColor: Colors.black,
-              unselectedLabelColor: Colors.black54, // Forzado a negro traslúcido
-              labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.black),
-              unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal, fontSize: 13, color: Colors.black54),
-              tabs: _categories.map((c) => Tab(
-                child: Text(c.toUpperCase(), style: const TextStyle(letterSpacing: 0.5)),
-              )).toList(),
-            ),
+          preferredSize: const Size.fromHeight(110),
+          child: Column(
+            children: [
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                height: 40,
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: _filterRankings,
+                  style: const TextStyle(color: Colors.black, fontSize: 14),
+                  decoration: InputDecoration(
+                    hintText: 'Buscar piloto o número...',
+                    hintStyle: TextStyle(color: Colors.grey[400], fontSize: 13),
+                    prefixIcon: const Icon(Icons.search, size: 18, color: Colors.grey),
+                    filled: true,
+                    fillColor: Colors.grey[100],
+                    contentPadding: EdgeInsets.zero,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                  ),
+                ),
+              ),
+              TabBar(
+                controller: _tabController,
+                isScrollable: true,
+                indicatorColor: Colors.red,
+                indicatorWeight: 3,
+                labelColor: Colors.black,
+                unselectedLabelColor: Colors.black54,
+                labelStyle: const TextStyle(fontWeight: FontWeight.w900, fontSize: 12, letterSpacing: 0.5),
+                unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal, fontSize: 12),
+                tabs: _categories.map((c) => Tab(text: c.toUpperCase())).toList(),
+              ),
+            ],
           ),
         ),
       ),
-      body: Container(
-        color: Colors.white,
-        child: TabBarView(
-          controller: _tabController,
-          children: _categories.map((cat) => _buildRankingList(cat)).toList(),
-        ),
+      body: TabBarView(
+        controller: _tabController,
+        children: _categories.map((cat) => _buildRankingList(cat)).toList(),
       ),
     );
   }
 
   Widget _buildRankingList(String category) {
-    final list = _rankingsByCat[category];
+    final list = _filteredRankingsByCat[category];
 
     if (list == null && _isLoading) {
       return const Center(child: CircularProgressIndicator(color: Colors.red));
@@ -134,9 +173,12 @@ class _RankingScreenState extends State<RankingScreen> with SingleTickerProvider
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.emoji_events_outlined, size: 60, color: Colors.grey[200]),
+            Icon(Icons.sports_motorsports_outlined, size: 64, color: Colors.grey[300]),
             const SizedBox(height: 16),
-            Text('No hay datos registrados aún', style: TextStyle(color: Colors.grey[400], fontSize: 14)),
+            Text(
+              _searchController.text.isEmpty ? 'No hay datos en esta categoría' : 'No se encontraron resultados', 
+              style: TextStyle(color: Colors.grey[500], fontSize: 15, fontWeight: FontWeight.w500)
+            ),
           ],
         ),
       );
@@ -170,85 +212,129 @@ class _RankingRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isTop3 = pos <= 3;
-    final colorPos = pos == 1 ? const Color(0xFFFFD700) : (pos == 2 ? const Color(0xFFC0C0C0) : (pos == 3 ? const Color(0xFFCD7F32) : Colors.grey[200]!));
+    final lastPoints = pilot['last_points'] ?? 0;
+    
+    Color posColor;
+    switch (pos) {
+      case 1: posColor = const Color(0xFFFFD700); break;
+      case 2: posColor = const Color(0xFFC0C0C0); break;
+      case 3: posColor = const Color(0xFFCD7F32); break;
+      default: posColor = Colors.grey[300]!;
+    }
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey[100]!),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))
+          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 12, offset: const Offset(0, 4))
         ],
       ),
-      child: Row(
-        children: [
-          // POSICIÓN
-          Container(
-            width: 32, height: 32,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: isTop3 ? colorPos.withOpacity(0.2) : Colors.transparent,
-              shape: BoxShape.circle,
-            ),
-            child: Text(
-              '$pos', 
-              style: TextStyle(
-                fontWeight: FontWeight.w900, 
-                fontSize: 15, 
-                color: isTop3 ? (pos == 1 ? const Color(0xFFB8860B) : Colors.black87) : Colors.grey[400]
-              )
-            ),
-          ),
-          const SizedBox(width: 12),
-          
-          // FOTO
-          Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: isTop3 ? colorPos : Colors.grey[200]!, width: 2),
-            ),
-            child: CircleAvatar(
-              radius: 18,
-              backgroundColor: Colors.grey[50],
-              backgroundImage: pilot['photo_url'] != null ? NetworkImage(pilot['photo_url']) : null,
-              child: pilot['photo_url'] == null ? Icon(Icons.person, color: Colors.grey[300], size: 20) : null,
-            ),
-          ),
-          const SizedBox(width: 16),
-          
-          // NOMBRE Y MOTO
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _formatName(pilot['pilot_name'] ?? 'Piloto'),
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.black),
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  'MOTOR #${pilot['moto_number'] ?? '-'}',
-                  style: TextStyle(color: Colors.grey[500], fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 0.5),
-                ),
-              ],
-            ),
-          ),
-          
-          // PUNTOS
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: IntrinsicHeight(
+          child: Row(
             children: [
-              Text(
-                '${pilot['points'] ?? 0}',
-                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: Colors.black),
+              // Indicador de posición lateral
+              Container(
+                width: 6,
+                color: isTop3 ? posColor : Colors.transparent,
               ),
-              const Text('PUNTOS', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Colors.grey, letterSpacing: 0.5)),
+              const SizedBox(width: 12),
+              
+              // Número de posición
+              Container(
+                width: 32,
+                alignment: Alignment.center,
+                child: Text(
+                  '$pos', 
+                  style: TextStyle(
+                    fontWeight: FontWeight.w900, 
+                    fontSize: 18, 
+                    color: isTop3 ? Colors.black : Colors.grey[400],
+                    fontStyle: FontStyle.italic
+                  )
+                ),
+              ),
+              
+              const SizedBox(width: 8),
+              
+              // Foto
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: isTop3 ? posColor : Colors.grey[100]!, width: 2),
+                  ),
+                  child: CircleAvatar(
+                    radius: 22,
+                    backgroundColor: Colors.grey[50],
+                    backgroundImage: pilot['photo_url'] != null ? NetworkImage(pilot['photo_url']) : null,
+                    child: pilot['photo_url'] == null ? Icon(Icons.person, color: Colors.grey[300], size: 24) : null,
+                  ),
+                ),
+              ),
+              
+              const SizedBox(width: 16),
+              
+              // Info del Piloto
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _formatName(pilot['pilot_name'] ?? 'Piloto'),
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        Text(
+                          'MOTO #${pilot['moto_number'] ?? '-'}',
+                          style: TextStyle(color: Colors.grey[500], fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 0.5),
+                        ),
+                        if (lastPoints > 0) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                            decoration: BoxDecoration(color: Colors.green[50], borderRadius: BorderRadius.circular(4)),
+                            child: Text(
+                              '+$lastPoints esta fecha',
+                              style: const TextStyle(color: Colors.green, fontSize: 9, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Puntos Totales
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[50],
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      '${pilot['points'] ?? 0}',
+                      style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: Colors.black),
+                    ),
+                    const Text('PTS', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: Colors.grey, letterSpacing: 1)),
+                  ],
+                ),
+              ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
