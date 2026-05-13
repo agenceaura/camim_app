@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
+import '../theme/app_theme.dart';
 
 class AdminLiveEventScreen extends StatefulWidget {
   const AdminLiveEventScreen({super.key});
@@ -85,7 +86,7 @@ class _AdminLiveEventScreenState extends State<AdminLiveEventScreen> {
       }
       _loadData();
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: AppTheme.camimRed));
     }
   }
 
@@ -101,26 +102,34 @@ class _AdminLiveEventScreenState extends State<AdminLiveEventScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      backgroundColor: Colors.transparent,
       builder: (context) => StatefulBuilder(
-        builder: (context, setModalState) => Padding(
+        builder: (context, setModalState) => Container(
+          decoration: const BoxDecoration(
+            color: AppTheme.camimAsh,
+            border: Border(top: BorderSide(color: AppTheme.camimRed, width: 4)),
+          ),
           padding: EdgeInsets.fromLTRB(24, 24, 24, MediaQuery.of(context).viewInsets.bottom + 24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('Gestionar: $category', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              Text('GESTIONAR: ${category.toUpperCase()}', style: AppTheme.displayFont(fontSize: 20, color: Colors.white)),
               const SizedBox(height: 20),
               
-              const Text('Estado de la Carrera', style: TextStyle(fontWeight: FontWeight.bold)),
+              Text('ESTADO DE LA CARRERA', style: AppTheme.dataFont(color: Colors.white54, fontSize: 10)),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
+                runSpacing: 8,
                 children: ['No iniciado', 'Manga 1', 'Manga 2', 'Finalizado'].map((s) {
                   final isSel = currentStatus == s;
                   return ChoiceChip(
-                    label: Text(s),
+                    label: Text(s.toUpperCase(), style: AppTheme.dataFont(color: isSel ? Colors.white : Colors.white54, fontSize: 12)),
                     selected: isSel,
+                    selectedColor: AppTheme.camimRed,
+                    backgroundColor: Colors.white10,
+                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                     onSelected: (val) {
                       if (val) setModalState(() => currentStatus = s);
                     },
@@ -130,41 +139,48 @@ class _AdminLiveEventScreenState extends State<AdminLiveEventScreen> {
               const SizedBox(height: 16),
               
               SwitchListTile(
-                title: const Text('Categoría en Pista (Destacar)', style: TextStyle(fontWeight: FontWeight.bold)),
+                contentPadding: EdgeInsets.zero,
+                title: Text('CATEGORÍA EN PISTA (DESTACAR)', style: AppTheme.dataFont(color: Colors.white, fontSize: 12)),
                 value: isActive,
                 onChanged: (val) => setModalState(() => isActive = val),
-                activeColor: Colors.red,
+                activeColor: AppTheme.camimRed,
               ),
               
               const SizedBox(height: 16),
               TextField(
                 controller: m1Controller, 
-                style: const TextStyle(color: Colors.black),
-                decoration: const InputDecoration(
-                  labelText: 'Resultados Manga 1 (ej. 1° Tulio, 2° Badiali)',
-                  labelStyle: TextStyle(color: Colors.grey),
+                style: AppTheme.dataFont(color: Colors.white),
+                decoration: InputDecoration(
+                  labelText: 'RESULTADOS MANGA 1 (EJ. 1° TULIO, 2° BADIALI)',
+                  labelStyle: AppTheme.dataFont(color: Colors.white38, fontSize: 10),
+                  enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.white24)),
+                  focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: AppTheme.camimRed)),
                 )
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: m2Controller, 
-                style: const TextStyle(color: Colors.black),
-                decoration: const InputDecoration(
-                  labelText: 'Resultados Manga 2',
-                  labelStyle: TextStyle(color: Colors.grey),
+                style: AppTheme.dataFont(color: Colors.white),
+                decoration: InputDecoration(
+                  labelText: 'RESULTADOS MANGA 2',
+                  labelStyle: AppTheme.dataFont(color: Colors.white38, fontSize: 10),
+                  enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.white24)),
+                  focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: AppTheme.camimRed)),
                 )
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: totalController, 
-                style: const TextStyle(color: Colors.black),
-                decoration: const InputDecoration(
-                  labelText: 'Puntos Totales / Podio',
-                  labelStyle: TextStyle(color: Colors.grey),
+                style: AppTheme.dataFont(color: Colors.white),
+                decoration: InputDecoration(
+                  labelText: 'PUNTOS TOTALES / PODIO',
+                  labelStyle: AppTheme.dataFont(color: Colors.white38, fontSize: 10),
+                  enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Colors.white24)),
+                  focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: AppTheme.camimRed)),
                 )
               ),
               
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
               ElevatedButton(
                 onPressed: () {
                   _upsertResult(
@@ -177,8 +193,12 @@ class _AdminLiveEventScreenState extends State<AdminLiveEventScreen> {
                   );
                   Navigator.pop(context);
                 },
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.black, padding: const EdgeInsets.symmetric(vertical: 16)),
-                child: const Text('GUARDAR ESTADO', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.camimRed, 
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero)
+                ),
+                child: Text('GUARDAR ESTADO', style: AppTheme.dataFont(color: Colors.white, fontSize: 14)),
               ),
             ],
           ),
@@ -190,34 +210,43 @@ class _AdminLiveEventScreenState extends State<AdminLiveEventScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppTheme.camimInk,
       appBar: AppBar(
-        title: const Text('Gestión En Vivo', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        elevation: 1,
-        iconTheme: const IconThemeData(color: Colors.black),
+        title: Text('◆ GESTIÓN EN VIVO', style: AppTheme.dataFont(color: Colors.white, fontSize: 16).copyWith(letterSpacing: 2)),
+        backgroundColor: AppTheme.camimInk,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(color: AppTheme.camimRed))
           : _activeEvent == null
-              ? const Center(child: Text('Debe haber un evento activo para gestionar.'))
+              ? Center(child: Text('DEBE HABER UN EVENTO ACTIVO PARA GESTIONAR.', style: AppTheme.dataFont(color: Colors.white54)))
               : ListView.separated(
                   padding: const EdgeInsets.all(16),
                   itemCount: _categories.length,
-                  separatorBuilder: (context, index) => const Divider(),
+                  separatorBuilder: (context, index) => const SizedBox(height: 8),
                   itemBuilder: (context, index) {
                     final cat = _categories[index];
                     final res = _liveResults.firstWhere((r) => r['category'] == cat, orElse: () => {});
                     final bool hasData = res.containsKey('id');
                     
-                    return ListTile(
-                      title: Text(cat, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
-                      subtitle: Text(
-                        hasData ? 'Estado: ${res['status']} | Activo: ${res['is_active']}' : 'Sin datos en vivo',
-                        style: TextStyle(color: Colors.grey[600]),
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: AppTheme.camimAsh,
+                        border: Border.all(color: Colors.white12),
                       ),
-                      trailing: const Icon(Icons.edit_outlined, color: Colors.black54),
-                      onTap: () => _showEditSheet(cat),
+                      child: ListTile(
+                        title: Text(cat.toUpperCase(), style: AppTheme.dataFont(color: Colors.white, fontSize: 14)),
+                        subtitle: Padding(
+                          padding: const EdgeInsets.only(top: 4.0),
+                          child: Text(
+                            hasData ? 'ESTADO: ${res['status'].toString().toUpperCase()} | ACTIVO: ${(res['is_active'] == true ? 'SÍ' : 'NO')}' : 'SIN DATOS EN VIVO',
+                            style: AppTheme.dataFont(color: Colors.white54, fontSize: 10),
+                          ),
+                        ),
+                        trailing: const Icon(Icons.edit_outlined, color: Colors.white54),
+                        onTap: () => _showEditSheet(cat),
+                      ),
                     );
                   },
                 ),

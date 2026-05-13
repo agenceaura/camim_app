@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
+import '../theme/app_theme.dart';
 
 class AdminNotificationsScreen extends StatefulWidget {
   const AdminNotificationsScreen({super.key});
@@ -17,10 +18,10 @@ class _AdminNotificationsScreenState extends State<AdminNotificationsScreen> {
   bool _isLoading = false;
 
   final List<Map<String, dynamic>> _types = [
-    {'id': 'info', 'label': 'Información', 'icon': Icons.info, 'color': Colors.blue},
-    {'id': 'news', 'label': 'Noticia', 'icon': Icons.article, 'color': Colors.green},
-    {'id': 'alert', 'label': 'Alerta', 'icon': Icons.warning, 'color': Colors.orange},
-    {'id': 'success', 'label': 'Resultados', 'icon': Icons.emoji_events, 'color': Colors.purple},
+    {'id': 'info', 'label': 'Información', 'icon': Icons.info, 'color': Colors.blueAccent},
+    {'id': 'news', 'label': 'Noticia', 'icon': Icons.article, 'color': Colors.greenAccent},
+    {'id': 'alert', 'label': 'Alerta', 'icon': Icons.warning, 'color': AppTheme.camimRed},
+    {'id': 'success', 'label': 'Resultados', 'icon': Icons.emoji_events, 'color': Colors.purpleAccent},
   ];
 
   @override
@@ -44,7 +45,7 @@ class _AdminNotificationsScreenState extends State<AdminNotificationsScreen> {
   Future<void> _sendNotification() async {
     if (_titleController.text.isEmpty || _bodyController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Completar título y mensaje')),
+        const SnackBar(content: Text('Completar título y mensaje'), backgroundColor: AppTheme.camimRed),
       );
       return;
     }
@@ -67,7 +68,7 @@ class _AdminNotificationsScreenState extends State<AdminNotificationsScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text('Error: $e'), backgroundColor: AppTheme.camimRed),
         );
       }
     } finally {
@@ -78,40 +79,52 @@ class _AdminNotificationsScreenState extends State<AdminNotificationsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppTheme.camimInk,
       appBar: AppBar(
-        title: const Text('Enviar Notificación', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
+        title: Text('◆ ENVIAR NOTIFICACIÓN', style: AppTheme.dataFont(color: Colors.white, fontSize: 16).copyWith(letterSpacing: 2)),
+        backgroundColor: AppTheme.camimInk,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Título', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text('TÍTULO', style: AppTheme.dataFont(color: Colors.white, fontSize: 14)),
             const SizedBox(height: 8),
             TextField(
               controller: _titleController,
+              style: AppTheme.dataFont(color: Colors.white),
               decoration: InputDecoration(
-                hintText: 'Ej: Nuevos Resultados Disponibles',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                hintText: 'EJ: NUEVOS RESULTADOS DISPONIBLES',
+                hintStyle: AppTheme.dataFont(color: Colors.white38, fontSize: 12),
+                filled: true,
+                fillColor: AppTheme.camimAsh,
+                border: const OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: Colors.white12)),
+                enabledBorder: const OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: Colors.white12)),
+                focusedBorder: const OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppTheme.camimRed)),
               ),
             ),
             const SizedBox(height: 24),
-            const Text('Mensaje', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text('MENSAJE', style: AppTheme.dataFont(color: Colors.white, fontSize: 14)),
             const SizedBox(height: 8),
             TextField(
               controller: _bodyController,
               maxLines: 4,
+              style: AppTheme.dataFont(color: Colors.white),
               decoration: InputDecoration(
-                hintText: 'Escribe el detalle de la notificación...',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                hintText: 'ESCRIBE EL DETALLE DE LA NOTIFICACIÓN...',
+                hintStyle: AppTheme.dataFont(color: Colors.white38, fontSize: 12),
+                filled: true,
+                fillColor: AppTheme.camimAsh,
+                border: const OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: Colors.white12)),
+                enabledBorder: const OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: Colors.white12)),
+                focusedBorder: const OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppTheme.camimRed)),
               ),
             ),
-            const SizedBox(height: 24),
-            const Text('Tipo de Notificación', style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 32),
+            Text('TIPO DE NOTIFICACIÓN', style: AppTheme.dataFont(color: Colors.white, fontSize: 14)),
             const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -121,42 +134,42 @@ class _AdminNotificationsScreenState extends State<AdminNotificationsScreen> {
                   onTap: () => setState(() => _selectedType = type['id']),
                   child: Container(
                     width: 70,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                     decoration: BoxDecoration(
-                      color: isSelected ? type['color'].withOpacity(0.1) : Colors.grey[50],
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: isSelected ? type['color'] : Colors.grey[200]!),
+                      color: isSelected ? type['color'].withOpacity(0.1) : AppTheme.camimAsh,
+                      border: Border.all(color: isSelected ? type['color'] : Colors.white12),
                     ),
                     child: Column(
                       children: [
-                        Icon(type['icon'], color: isSelected ? type['color'] : Colors.grey[400]),
-                        const SizedBox(height: 4),
-                        Text(type['id'].toUpperCase(), style: TextStyle(fontSize: 10, color: isSelected ? type['color'] : Colors.grey[600], fontWeight: FontWeight.bold)),
+                        Icon(type['icon'], color: isSelected ? type['color'] : Colors.white38),
+                        const SizedBox(height: 8),
+                        Text(type['id'].toUpperCase(), style: AppTheme.dataFont(fontSize: 8, color: isSelected ? type['color'] : Colors.white54)),
                       ],
                     ),
                   ),
                 );
               }).toList(),
             ),
-            const SizedBox(height: 24),
-            const Text('Enviar a:', style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 32),
+            Text('ENVIAR A:', style: AppTheme.dataFont(color: Colors.white, fontSize: 14)),
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
-                color: Colors.grey[50],
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey[200]!),
+                color: AppTheme.camimAsh,
+                border: Border.all(color: Colors.white12),
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
                   value: _targetRole,
                   isExpanded: true,
+                  dropdownColor: AppTheme.camimAsh,
+                  icon: const Icon(Icons.arrow_drop_down, color: Colors.white54),
                   onChanged: (val) => setState(() => _targetRole = val!),
-                  items: const [
-                    DropdownMenuItem(value: 'all', child: Text('Todos los usuarios')),
-                    DropdownMenuItem(value: 'pilot', child: Text('Solo Pilotos')),
-                    DropdownMenuItem(value: 'spectator', child: Text('Solo Espectadores')),
+                  items: [
+                    DropdownMenuItem(value: 'all', child: Text('TODOS LOS USUARIOS', style: AppTheme.dataFont(color: Colors.white, fontSize: 12))),
+                    DropdownMenuItem(value: 'pilot', child: Text('SOLO PILOTOS', style: AppTheme.dataFont(color: Colors.white, fontSize: 12))),
+                    DropdownMenuItem(value: 'spectator', child: Text('SOLO ESPECTADORES', style: AppTheme.dataFont(color: Colors.white, fontSize: 12))),
                   ],
                 ),
               ),
@@ -167,14 +180,14 @@ class _AdminNotificationsScreenState extends State<AdminNotificationsScreen> {
               child: ElevatedButton(
                 onPressed: _isLoading ? null : _sendNotification,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
+                  backgroundColor: AppTheme.camimRed,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                 ),
                 child: _isLoading 
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text('PUBLICAR NOTIFICACIÓN', style: TextStyle(fontWeight: FontWeight.bold)),
+                    : Text('PUBLICAR NOTIFICACIÓN', style: AppTheme.dataFont(color: Colors.white, fontSize: 16)),
               ),
             ),
           ],

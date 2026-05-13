@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../theme/app_theme.dart';
 
 class AdminPilotsListScreen extends StatefulWidget {
   const AdminPilotsListScreen({super.key});
@@ -72,13 +73,13 @@ class _AdminPilotsListScreenState extends State<AdminPilotsListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: AppTheme.camimInk,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF8F9FA),
+        backgroundColor: AppTheme.camimInk,
         elevation: 0,
-        title: const Text('Gestión de Perfiles', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        title: Text('◆ GESTIÓN DE PERFILES', style: AppTheme.dataFont(color: Colors.white, fontSize: 16).copyWith(letterSpacing: 2)),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => context.pop(),
         ),
       ),
@@ -89,23 +90,26 @@ class _AdminPilotsListScreenState extends State<AdminPilotsListScreen> {
             child: TextField(
               controller: _searchController,
               onChanged: _filterPilots,
+              style: AppTheme.dataFont(color: Colors.white, fontSize: 14),
               decoration: InputDecoration(
-                hintText: 'Buscar por nombre o número...',
-                prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                hintText: 'BUSCAR POR NOMBRE O NÚMERO...',
+                hintStyle: AppTheme.dataFont(color: Colors.white38, fontSize: 12),
+                prefixIcon: const Icon(Icons.search, color: Colors.white54),
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: AppTheme.camimAsh,
                 contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                border: const OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: Colors.white12)),
+                enabledBorder: const OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: Colors.white12)),
+                focusedBorder: const OutlineInputBorder(borderRadius: BorderRadius.zero, borderSide: BorderSide(color: AppTheme.camimRed)),
               ),
             ),
           ),
           
           Expanded(
             child: _isLoading 
-              ? const Center(child: CircularProgressIndicator())
+              ? const Center(child: CircularProgressIndicator(color: AppTheme.camimRed))
               : _filteredPilots.isEmpty
-                ? const Center(child: Text('No hay perfiles.'))
+                ? Center(child: Text('NO HAY PERFILES.', style: AppTheme.dataFont(color: Colors.white54)))
                 : ListView.separated(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                   itemCount: _filteredPilots.length,
@@ -123,21 +127,22 @@ class _AdminPilotsListScreenState extends State<AdminPilotsListScreen> {
                          final refresh = await context.push('/admin_edit_pilot', extra: profile);
                          if (refresh == true) _loadPilots();
                       },
-                      borderRadius: BorderRadius.circular(16),
                       child: Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.grey[200]!)
+                          color: AppTheme.camimAsh,
+                          border: Border.all(color: Colors.white12)
                         ),
                         child: Row(
                           children: [
-                            CircleAvatar(
-                              backgroundColor: Colors.grey[200],
-                              radius: 24,
-                              backgroundImage: photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
-                              child: photoUrl.isEmpty ? const Icon(Icons.person, color: Colors.grey) : null,
+                            Container(
+                              width: 48,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: Colors.white10,
+                                image: photoUrl.isNotEmpty ? DecorationImage(image: NetworkImage(photoUrl), fit: BoxFit.cover) : null,
+                              ),
+                              child: photoUrl.isEmpty ? const Icon(Icons.person, color: Colors.white54) : null,
                             ),
                             const SizedBox(width: 16),
                             Expanded(
@@ -145,14 +150,14 @@ class _AdminPilotsListScreenState extends State<AdminPilotsListScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    name.isEmpty ? 'Sin Nombre' : _formatName(name), 
-                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black)
+                                    name.isEmpty ? 'SIN NOMBRE' : name.toUpperCase(), 
+                                    style: AppTheme.dataFont(color: Colors.white, fontSize: 14)
                                   ),
                                   const SizedBox(height: 4),
                                   if (moto.isNotEmpty) 
                                     Text(
-                                      moto, 
-                                      style: TextStyle(color: Colors.grey[600], fontSize: 13)
+                                      moto.toUpperCase(), 
+                                      style: AppTheme.dataFont(color: Colors.white54, fontSize: 10)
                                     ),
                                 ],
                               )
@@ -160,20 +165,17 @@ class _AdminPilotsListScreenState extends State<AdminPilotsListScreen> {
                             if (num.isNotEmpty)
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                decoration: BoxDecoration(color: Colors.red[50], borderRadius: BorderRadius.circular(8)),
-                                child: Text('#$num', style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w900)),
+                                color: Colors.white10,
+                                child: Text('#$num', style: AppTheme.dataFont(color: AppTheme.camimRed, fontSize: 14)),
                               ),
                             const SizedBox(width: 12),
                             Container(
                               padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                color: role == 'admin' ? Colors.black : (role == 'pilot' ? Colors.green[50] : Colors.grey[100]), 
-                                borderRadius: BorderRadius.circular(8)
-                              ),
+                              color: role == 'admin' ? AppTheme.camimRed : (role == 'pilot' ? Colors.greenAccent.withOpacity(0.1) : Colors.white10),
                               child: Icon(
                                 role == 'admin' ? Icons.security : (role == 'pilot' ? Icons.sports_motorsports : Icons.visibility),
                                 size: 16,
-                                color: role == 'admin' ? Colors.white : (role == 'pilot' ? Colors.green : Colors.grey),
+                                color: role == 'admin' ? Colors.white : (role == 'pilot' ? Colors.greenAccent : Colors.white54),
                               ),
                             )
                           ],
@@ -186,13 +188,5 @@ class _AdminPilotsListScreenState extends State<AdminPilotsListScreen> {
         ],
       ),
     );
-  }
-
-  String _formatName(String text) {
-    if (text.isEmpty) return text;
-    return text.split(' ').map((str) {
-      if (str.isEmpty) return str;
-      return str[0].toUpperCase() + str.substring(1).toLowerCase();
-    }).join(' ');
   }
 }

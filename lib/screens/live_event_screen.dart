@@ -51,44 +51,46 @@ class _LiveEventScreenState extends State<LiveEventScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: AppTheme.camimInk,
       appBar: AppBar(
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.circle, color: Colors.red, size: 12),
-            SizedBox(width: 8),
-            Text('Carrera en Vivo', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+            const Icon(Icons.circle, color: AppTheme.camimRed, size: 12),
+            const SizedBox(width: 12),
+            Text('EN VIVO', style: AppTheme.dataFont(color: Colors.white, fontSize: 16).copyWith(letterSpacing: 2)),
           ],
         ),
-        backgroundColor: Colors.white,
-        elevation: 1,
-        iconTheme: const IconThemeData(color: Colors.black),
+        backgroundColor: AppTheme.camimInk,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(color: AppTheme.camimRed))
           : _activeEvent == null
-              ? const Center(child: Text('No hay eventos activos en este momento'))
+              ? Center(child: Text('NO HAY EVENTOS ACTIVOS', style: AppTheme.dataFont(color: Colors.white54, fontSize: 12)))
               : RefreshIndicator(
+                  color: AppTheme.camimRed,
+                  backgroundColor: AppTheme.camimAsh,
                   onRefresh: _loadLiveContent,
                   child: ListView(
                     padding: const EdgeInsets.all(20),
                     children: [
                       _buildHeader(),
-                      const SizedBox(height: 24),
-                      const Text(
+                      const SizedBox(height: 32),
+                      Text(
                         'ESTADO DE LAS CATEGORÍAS',
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, letterSpacing: 1.2, color: Colors.grey),
+                        style: AppTheme.dataFont(fontSize: 14, color: Colors.white54).copyWith(letterSpacing: 1.2),
                       ),
                       const SizedBox(height: 16),
                       if (_liveResults.isEmpty)
-                        const Center(
+                        Center(
                           child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 40),
+                            padding: const EdgeInsets.symmetric(vertical: 40),
                             child: Column(
                               children: [
-                                Icon(Icons.timer_outlined, size: 48, color: Colors.grey),
-                                SizedBox(height: 12),
-                                Text('Esperando el inicio de las mangas...', style: TextStyle(color: Colors.grey)),
+                                const Icon(Icons.timer_outlined, size: 48, color: Colors.white24),
+                                const SizedBox(height: 12),
+                                Text('ESPERANDO INICIO DE MANGAS...', style: AppTheme.dataFont(color: Colors.white54, fontSize: 10)),
                               ],
                             ),
                           ),
@@ -106,26 +108,25 @@ class _LiveEventScreenState extends State<LiveEventScreen> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))],
+        color: AppTheme.camimAsh,
+        border: const Border(left: BorderSide(color: AppTheme.camimRed, width: 4)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             _activeEvent!['subtitle']?.toString().toUpperCase() ?? 'EVENTO',
-            style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w900, fontSize: 12, letterSpacing: 2),
+            style: AppTheme.dataFont(color: AppTheme.camimRed, fontSize: 10).copyWith(letterSpacing: 2),
           ),
           const SizedBox(height: 8),
           Text(
-            _activeEvent!['title']?.toString() ?? 'Sin Título',
-            style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+            _activeEvent!['title']?.toString().toUpperCase() ?? 'SIN TÍTULO',
+            style: AppTheme.displayFont(color: Colors.white, fontSize: 24).copyWith(height: 1),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 8),
           Text(
-            _activeEvent!['location_name']?.toString() ?? '',
-            style: const TextStyle(color: Colors.grey, fontSize: 14),
+            _activeEvent!['location_name']?.toString().toUpperCase() ?? '',
+            style: AppTheme.dataFont(color: Colors.white54, fontSize: 12),
           ),
         ],
       ),
@@ -133,38 +134,38 @@ class _LiveEventScreenState extends State<LiveEventScreen> {
   }
 
   Widget _buildLiveCard(Map<String, dynamic> result) {
-    final category = result['category'] ?? 'Categoría';
+    final category = result['category'] ?? 'CATEGORÍA';
     final status = result['status'] ?? 'No iniciado';
     final m1 = result['manga_1_results'] ?? '';
     final m2 = result['manga_2_results'] ?? '';
     final total = result['total_points'] ?? '';
     final isActive = result['is_active'] == true;
 
-    Color statusColor = Colors.grey;
-    if (status == 'Manga 1' || status == 'Manga 2') statusColor = Colors.green;
-    if (status == 'Finalizado') statusColor = Colors.blue;
+    Color statusColor = Colors.white54;
+    if (status == 'Manga 1' || status == 'Manga 2') statusColor = Colors.greenAccent;
+    if (status == 'Finalizado') statusColor = Colors.lightBlueAccent;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: isActive ? Colors.red.withOpacity(0.5) : Colors.grey[200]!, width: isActive ? 2 : 1),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4))],
+        color: AppTheme.camimAsh,
+        border: Border.all(color: isActive ? AppTheme.camimRed : Colors.white12, width: isActive ? 2 : 1),
       ),
       child: ExpansionTile(
         shape: const RoundedRectangleBorder(side: BorderSide.none),
+        iconColor: Colors.white,
+        collapsedIconColor: Colors.white54,
         title: Row(
           children: [
             if (isActive)
               const Padding(
-                padding: EdgeInsets.only(right: 8),
-                child: Icon(Icons.circle, color: Colors.red, size: 10),
+                padding: EdgeInsets.only(right: 12),
+                child: Icon(Icons.circle, color: AppTheme.camimRed, size: 8),
               ),
             Expanded(
               child: Text(
-                category,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                category.toString().toUpperCase(),
+                style: AppTheme.dataFont(color: Colors.white, fontSize: 14),
               ),
             ),
           ],
@@ -172,11 +173,12 @@ class _LiveEventScreenState extends State<LiveEventScreen> {
         subtitle: Row(
           children: [
             Container(
+              margin: const EdgeInsets.only(top: 4),
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(color: statusColor.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+              color: statusColor.withOpacity(0.1),
               child: Text(
-                status.toUpperCase(),
-                style: TextStyle(color: statusColor, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 0.5),
+                status.toString().toUpperCase(),
+                style: AppTheme.dataFont(color: statusColor, fontSize: 10),
               ),
             ),
           ],
@@ -187,13 +189,13 @@ class _LiveEventScreenState extends State<LiveEventScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Divider(),
+                const Divider(color: Colors.white12),
+                const SizedBox(height: 12),
+                _buildResultRow('1RA MANGA', m1),
                 const SizedBox(height: 8),
-                _buildResultRow('1ra Manga', m1),
+                _buildResultRow('2DA MANGA', m2),
                 const SizedBox(height: 8),
-                _buildResultRow('2da Manga', m2),
-                const SizedBox(height: 8),
-                _buildResultRow('Puntos Totales', total, isBold: true),
+                _buildResultRow('PUNTOS TOTALES', total, isBold: true),
               ],
             ),
           ),
@@ -208,15 +210,14 @@ class _LiveEventScreenState extends State<LiveEventScreen> {
       children: [
         SizedBox(
           width: 100,
-          child: Text(label, style: const TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
+          child: Text(label, style: AppTheme.dataFont(color: Colors.white54, fontSize: 10)),
         ),
         Expanded(
           child: Text(
-            results.isEmpty ? 'Sin datos' : results,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-              color: results.isEmpty ? Colors.grey[400] : Colors.black,
+            results.isEmpty ? 'SIN DATOS' : results,
+            style: AppTheme.dataFont(
+              fontSize: 12,
+              color: results.isEmpty ? Colors.white38 : (isBold ? Colors.white : Colors.white70),
             ),
           ),
         ),

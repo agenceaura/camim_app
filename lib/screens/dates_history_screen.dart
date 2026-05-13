@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../theme/app_theme.dart';
 
 class DatesHistoryScreen extends StatefulWidget {
   const DatesHistoryScreen({super.key});
@@ -46,7 +47,7 @@ class _DatesHistoryScreenState extends State<DatesHistoryScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error al cargar historial: $e'), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error al cargar historial: $e'), backgroundColor: AppTheme.camimRed));
         setState(() => _isLoading = false);
       }
     }
@@ -57,23 +58,26 @@ class _DatesHistoryScreenState extends State<DatesHistoryScreen> {
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No se pudo abrir el enlace')));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No se pudo abrir el enlace'), backgroundColor: AppTheme.camimRed));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: AppTheme.camimInk,
       appBar: AppBar(
-        title: const Text('Fechas y Resultados', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        elevation: 1,
-        iconTheme: const IconThemeData(color: Colors.black),
+        title: Text('◆ RESULTADOS', style: AppTheme.dataFont(color: Colors.white, fontSize: 16).copyWith(letterSpacing: 2)),
+        backgroundColor: AppTheme.camimInk,
+        elevation: 0,
+        centerTitle: false,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(color: AppTheme.camimRed))
           : RefreshIndicator(
+              color: AppTheme.camimRed,
+              backgroundColor: AppTheme.camimAsh,
               onRefresh: _loadEvents,
               child: ListView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
@@ -82,17 +86,15 @@ class _DatesHistoryScreenState extends State<DatesHistoryScreen> {
                   final event = _events[index];
                   final bool isActive = event['is_active'] == true;
                   final String subtitle = event['subtitle']?.toString() ?? '';
-                  final String title = event['title']?.toString() ?? 'Sin Título';
+                  final String title = event['title']?.toString() ?? 'SIN TÍTULO';
                   final String speedhive = event['speedhive_link']?.toString() ?? '';
-                  final String days = event['days_text']?.toString() ?? '';
-                  final String location = event['location_name']?.toString() ?? '';
 
-                  return Card(
-                    margin: const EdgeInsets.only(bottom: 20),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    elevation: 5,
-                    shadowColor: Colors.black12,
-                    color: Colors.white,
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: AppTheme.camimAsh,
+                      border: Border.all(color: isActive ? AppTheme.camimRed : Colors.white12, width: isActive ? 2 : 1),
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.all(20),
                       child: Column(
@@ -104,17 +106,17 @@ class _DatesHistoryScreenState extends State<DatesHistoryScreen> {
                               if (subtitle.isNotEmpty)
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                  decoration: BoxDecoration(color: isActive ? Colors.red : Colors.grey[800], borderRadius: BorderRadius.circular(12)),
-                                  child: Text(subtitle.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                                  color: isActive ? AppTheme.camimRed : Colors.white10,
+                                  child: Text(subtitle.toUpperCase(), style: AppTheme.dataFont(color: Colors.white, fontSize: 10)),
                                 ),
                               if (isActive)
-                                const Text('PRÓXIMA CARRERA', style: TextStyle(color: Colors.green, fontSize: 11, fontWeight: FontWeight.bold))
+                                Text('PRÓXIMA CARRERA', style: AppTheme.dataFont(color: Colors.greenAccent, fontSize: 10))
                             ],
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 16),
                           Text(
-                            title, 
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 22, color: Colors.black)
+                            title.toUpperCase(), 
+                            style: AppTheme.displayFont(color: Colors.white, fontSize: 22).copyWith(height: 1.1)
                           ),
                           const SizedBox(height: 12),
 
@@ -125,17 +127,17 @@ class _DatesHistoryScreenState extends State<DatesHistoryScreen> {
                               child: ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFFE31837), // Speedhive-like red
-                                  padding: const EdgeInsets.symmetric(vertical: 14),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                                 ),
                                 onPressed: () => _openSpeedhive(speedhive.trim()),
                                 icon: const Icon(Icons.leaderboard, color: Colors.white),
-                                label: const Text('VER RESULTADOS (SPEEDHIVE)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                label: Text('RESULTADOS EN SPEEDHIVE', style: AppTheme.dataFont(color: Colors.white, fontSize: 12)),
                               ),
                             ),
                           ] else if (!isActive) ...[
                              const SizedBox(height: 20),
-                             Center(child: Text('Resultados no disponibles', style: TextStyle(color: Colors.grey[400], fontStyle: FontStyle.italic))),
+                             Center(child: Text('RESULTADOS NO DISPONIBLES', style: AppTheme.dataFont(color: Colors.white38, fontSize: 12))),
                           ]
                         ],
                       ),

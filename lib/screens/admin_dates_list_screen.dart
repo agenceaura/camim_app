@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
+import '../theme/app_theme.dart';
 
 class AdminDatesListScreen extends StatefulWidget {
   const AdminDatesListScreen({super.key});
@@ -57,7 +58,7 @@ class _AdminDatesListScreenState extends State<AdminDatesListScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error al cargar fechas: $e'), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error al cargar fechas: $e'), backgroundColor: AppTheme.camimRed));
         setState(() => _isLoading = false);
       }
     }
@@ -66,16 +67,18 @@ class _AdminDatesListScreenState extends State<AdminDatesListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: AppTheme.camimInk,
       appBar: AppBar(
-        title: const Text('Gestión de Fechas', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        elevation: 1,
-        iconTheme: const IconThemeData(color: Colors.black),
+        title: Text('◆ GESTIÓN DE FECHAS', style: AppTheme.dataFont(color: Colors.white, fontSize: 16).copyWith(letterSpacing: 2)),
+        backgroundColor: AppTheme.camimInk,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(color: AppTheme.camimRed))
           : RefreshIndicator(
+              color: AppTheme.camimRed,
+              backgroundColor: AppTheme.camimAsh,
               onRefresh: _loadEvents,
               child: ListView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
@@ -86,9 +89,9 @@ class _AdminDatesListScreenState extends State<AdminDatesListScreen> {
                       padding: const EdgeInsets.only(bottom: 24),
                       child: ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black,
+                          backgroundColor: AppTheme.camimRed,
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                         ),
                         onPressed: () async {
                           final result = await context.push('/edit_event');
@@ -97,7 +100,7 @@ class _AdminDatesListScreenState extends State<AdminDatesListScreen> {
                           }
                         },
                         icon: const Icon(Icons.add, color: Colors.white),
-                        label: const Text('CREAR NUEVA FECHA', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                        label: Text('CREAR NUEVA FECHA', style: AppTheme.dataFont(color: Colors.white, fontSize: 14)),
                       ),
                     );
                   }
@@ -105,14 +108,15 @@ class _AdminDatesListScreenState extends State<AdminDatesListScreen> {
                   final event = _events[index - 1];
                   final bool isActive = event['is_active'] == true;
                   final String subtitle = event['subtitle']?.toString() ?? '';
-                  final String title = event['title']?.toString() ?? 'Sin Título';
+                  final String title = event['title']?.toString() ?? 'SIN TÍTULO';
                   final String speedhive = event['speedhive_link']?.toString() ?? '';
 
-                  return Card(
+                  return Container(
                     margin: const EdgeInsets.only(bottom: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    elevation: 0,
-                    color: Colors.white,
+                    decoration: BoxDecoration(
+                      color: AppTheme.camimAsh,
+                      border: Border.all(color: isActive ? AppTheme.camimRed : Colors.white12, width: isActive ? 2 : 1),
+                    ),
                     child: ListTile(
                       contentPadding: const EdgeInsets.all(16),
                       onTap: () async {
@@ -123,12 +127,12 @@ class _AdminDatesListScreenState extends State<AdminDatesListScreen> {
                       },
                       title: Row(
                         children: [
-                          Expanded(child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black))),
+                          Expanded(child: Text(title.toUpperCase(), style: AppTheme.displayFont(fontSize: 18, color: Colors.white))),
                           if (isActive)
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(color: Colors.green, borderRadius: BorderRadius.circular(12)),
-                              child: const Text('ACTIVO', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                              color: Colors.greenAccent.withOpacity(0.1),
+                              child: Text('ACTIVO', style: AppTheme.dataFont(color: Colors.greenAccent, fontSize: 10)),
                             ),
                         ],
                       ),
@@ -137,20 +141,20 @@ class _AdminDatesListScreenState extends State<AdminDatesListScreen> {
                         children: [
                           const SizedBox(height: 8),
                           if (subtitle.isNotEmpty)
-                            Text(subtitle, style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.bold)),
+                            Text(subtitle.toUpperCase(), style: AppTheme.dataFont(color: Colors.white54, fontSize: 12)),
                           if (speedhive.isNotEmpty) ...[
-                            const SizedBox(height: 4),
+                            const SizedBox(height: 8),
                             Row(
                               children: [
-                                const Icon(Icons.link, size: 14, color: Colors.blue),
+                                const Icon(Icons.link, size: 14, color: Colors.lightBlueAccent),
                                 const SizedBox(width: 4),
-                                Expanded(child: Text('Tiene link de resultados', style: TextStyle(color: Colors.blue[700], fontSize: 13))),
+                                Expanded(child: Text('TIENE LINK DE RESULTADOS', style: AppTheme.dataFont(color: Colors.lightBlueAccent, fontSize: 10))),
                               ]
                             )
                           ]
                         ],
                       ),
-                      trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+                      trailing: const Icon(Icons.chevron_right, color: Colors.white54),
                     ),
                   );
                 },
