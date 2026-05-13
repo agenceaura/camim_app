@@ -137,7 +137,7 @@ class _GuestTicketScreenState extends State<GuestTicketScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('TOTAL A PAGAR', style: AppTheme.dataFont(color: Colors.white54, fontSize: 10)),
-                      Text('\$ 3.500', style: AppTheme.displayFont(color: Colors.white, fontSize: 24)),
+                      Text('\$ 8.000', style: AppTheme.displayFont(color: Colors.white, fontSize: 24)),
                     ],
                   ),
                   const Icon(Icons.payment, color: Colors.white38),
