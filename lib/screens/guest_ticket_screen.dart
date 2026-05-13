@@ -20,8 +20,10 @@ class _GuestTicketScreenState extends State<GuestTicketScreen> {
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.camimInk,
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-        side: const BorderSide(color: AppTheme.camimRed, width: 2),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.zero,
+          side: BorderSide(color: AppTheme.camimRed, width: 2),
+        ),
         title: Text('¡PAGO EXITOSO! 🎉', style: AppTheme.displayFont(color: Colors.white, fontSize: 24)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -135,7 +137,7 @@ class _GuestTicketScreenState extends State<GuestTicketScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('TOTAL A PAGAR', style: AppTheme.dataFont(color: Colors.white54, fontSize: 10)),
-                      Text('$ 3.500', style: AppTheme.displayFont(color: Colors.white, fontSize: 24)),
+                      Text('\$ 3.500', style: AppTheme.displayFont(color: Colors.white, fontSize: 24)),
                     ],
                   ),
                   const Icon(Icons.payment, color: Colors.white38),

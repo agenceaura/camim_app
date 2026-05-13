@@ -318,7 +318,7 @@ class _AppCalendarScreenState extends State<AppCalendarScreen> {
                       Text(item['subtitle']?.toString().toUpperCase() ?? '', style: AppTheme.dataFont(color: AppTheme.camimRed, fontSize: 10)),
                       if (item['days_text'] != null)
                         Padding(
-                          padding: const EdgeInsets.top(4.0),
+                          padding: const EdgeInsets.only(top: 4.0),
                           child: Text(item['days_text'].toString().toUpperCase(), style: AppTheme.dataFont(color: Colors.white54, fontSize: 10)),
                         ),
                     ],
