@@ -5,6 +5,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../services/profile_service.dart';
 import '../widgets/countdown_widget.dart';
 import '../widgets/qr_modal.dart';
+import '../theme/app_theme.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -172,29 +173,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     String subtitle = 'PRÓXIMAMENTE';
-    String title = 'Sin eventos activos';
+    String title = 'SIN EVENTOS ACTIVOS';
     String days = '...';
 
     if (_activeEvent != null) {
       subtitle = _activeEvent!['subtitle']?.toString().toUpperCase() ?? '';
-      if (subtitle.isNotEmpty) subtitle += ' - ACTIVO';
-      title = _activeEvent!['title']?.toString() ?? 'Evento';
+      if (subtitle.isNotEmpty) subtitle += ' // ACTIVO';
+      title = _activeEvent!['title']?.toString() ?? 'EVENTO';
       days = _activeEvent!['days_text']?.toString() ?? '';
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: AppTheme.camimInk,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'CAMIM', 
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontStyle: FontStyle.italic, fontSize: 18, letterSpacing: 1)
+          style: AppTheme.displayFont(color: Colors.white, fontSize: 24)
         ),
-        backgroundColor: const Color(0xFFF8F9FA),
+        backgroundColor: AppTheme.camimInk,
         elevation: 0,
         centerTitle: false,
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout, color: Colors.black),
+            icon: const Icon(Icons.logout, color: Colors.white70),
             onPressed: () async {
               await Supabase.instance.client.auth.signOut();
               if (context.mounted) context.go('/login');
@@ -203,6 +204,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ],
       ),
       body: RefreshIndicator(
+        color: AppTheme.camimRed,
+        backgroundColor: AppTheme.camimAsh,
         onRefresh: _loadData,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
@@ -210,15 +213,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 10),
-              Center(
-                child: Image.asset(
-                  'assets/logo.png',
-                  height: 60,
-                  errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
-                ),
-              ),
-              const SizedBox(height: 30),
               // HEADER PERSONALIZADO
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -226,8 +220,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Hola, ${_formatName(_userName ?? 'Piloto')} 👋', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black)),
-                      const Text('¡Bienvenido de nuevo!', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                      Text('◆ ${_formatName(_userName ?? 'PILOTO').toUpperCase()}', style: AppTheme.dataFont(color: AppTheme.camimRed, fontSize: 13).copyWith(letterSpacing: 2)),
+                      const SizedBox(height: 4),
+                      Text('SISTEMA ONLINE', style: AppTheme.subheadFont(color: Colors.white54, fontSize: 16)),
                     ],
                   ),
                   GestureDetector(
@@ -240,20 +235,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: Stack(
                       alignment: Alignment.bottomRight,
                       children: [
-                        CircleAvatar(
-                          radius: 25,
-                          backgroundColor: Colors.grey[200],
-                          backgroundImage: _photoUrl != null ? NetworkImage(_photoUrl!) : null,
-                          child: _photoUrl == null ? const Icon(Icons.person, color: Colors.grey) : null,
+                        Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: AppTheme.camimAsh,
+                            border: Border.all(color: Colors.white12, width: 2),
+                            image: _photoUrl != null ? DecorationImage(image: NetworkImage(_photoUrl!), fit: BoxFit.cover) : null,
+                          ),
+                          child: _photoUrl == null ? const Icon(Icons.person, color: Colors.white30) : null,
                         ),
                         if (!_isOrganizer)
                           Container(
                             padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              color: Colors.black, 
-                              shape: BoxShape.circle, 
-                              border: Border.all(color: Colors.white, width: 2)
-                            ),
+                            color: AppTheme.camimRed,
                             child: const Icon(Icons.edit, size: 10, color: Colors.white),
                           )
                       ],
@@ -263,27 +258,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               const SizedBox(height: 24),
               
-              // STATS CARDS (Unas debajo de otras si hay varias)
+              // STATS CARDS (Piloto)
               if (_userRankings.isNotEmpty && !_isOrganizer)
                 ..._userRankings.map((rk) => InkWell(
                   onTap: () => context.push('/ranking'),
-                  borderRadius: BorderRadius.circular(16),
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     margin: const EdgeInsets.only(bottom: 12),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(colors: [Color(0xFF1A1A1A), Color(0xFF333333)]),
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))],
+                      color: AppTheme.camimAsh,
+                      border: Border.all(color: Colors.white12),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        _buildStatItem('Categoría', rk['category']),
-                        Container(width: 1, height: 30, color: Colors.white24),
-                        _buildStatItem('Posición', '#${rk['position']}'),
-                        Container(width: 1, height: 30, color: Colors.white24),
-                        _buildStatItem('Puntos', '${rk['points']}'),
+                        _buildStatItem('CATEGORÍA', rk['category']),
+                        Container(width: 1, height: 30, color: Colors.white12),
+                        _buildStatItem('POSICIÓN', 'P${rk['position']}', highlight: true),
+                        Container(width: 1, height: 30, color: Colors.white12),
+                        _buildStatItem('PUNTOS', '${rk['points']}'),
                       ],
                     ),
                   ),
@@ -292,101 +285,91 @@ class _DashboardScreenState extends State<DashboardScreen> {
               if (_userRankings.isNotEmpty && !_isOrganizer) const SizedBox(height: 12),
 
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Próxima Carrera', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)),
-                  const SizedBox(width: 12),
+                  Text('PRÓXIMA FECHA', style: AppTheme.subheadFont(color: Colors.white, fontSize: 20)),
                   InkWell(
                     onTap: () => context.push('/birthday_calendar'),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.grey[200]!),
+                        color: Colors.white10,
+                        border: Border.all(color: Colors.white24),
                       ),
-                      child: const Row(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.calendar_today, size: 12, color: Colors.red),
-                          const SizedBox(width: 4),
-                          Text('Calendario', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.black)),
+                          const Icon(Icons.calendar_today, size: 12, color: AppTheme.camimRed),
+                          const SizedBox(width: 6),
+                          Text('CALENDARIO', style: AppTheme.dataFont(color: Colors.white, fontSize: 10)),
                         ],
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               
               if (_isLoading)
-                const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator()))
+                const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator(color: AppTheme.camimRed)))
               else
                 InkWell(
                   onTap: () async {
                     await context.push('/calendar_detail');
                     _loadData(); // actualiza por si admin edita
                   },
-                  borderRadius: BorderRadius.circular(20),
                   child: Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 5)),
-                      ]
+                      color: AppTheme.camimAsh,
+                      border: const Border(left: BorderSide(color: AppTheme.camimRed, width: 4)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(20)),
-                          child: Text(subtitle, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1)),
-                        ),
-                        const SizedBox(height: 12),
-                        Text(title, style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+                        Text(subtitle, style: AppTheme.dataFont(color: AppTheme.camimRed, fontSize: 10).copyWith(letterSpacing: 2)),
                         const SizedBox(height: 8),
-                          if (_activeEvent != null && _activeEvent!['date_start'] != null)
-                            Row(
-                              children: [
-                                const Icon(Icons.timer_outlined, color: Colors.white70, size: 14),
-                                const SizedBox(width: 8),
-                                CountdownWidget(
-                                  targetDate: DateTime.tryParse(_activeEvent!['date_start']!),
-                                  style: const TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w500),
-                                ),
-                              ],
-                            ),
+                        Text(title.toUpperCase(), style: AppTheme.displayFont(color: Colors.white, fontSize: 26).copyWith(height: 1)),
+                        const SizedBox(height: 12),
+                        if (_activeEvent != null && _activeEvent!['date_start'] != null)
+                          Row(
+                            children: [
+                              const Icon(Icons.timer_outlined, color: Colors.white54, size: 14),
+                              const SizedBox(width: 8),
+                              CountdownWidget(
+                                targetDate: DateTime.tryParse(_activeEvent!['date_start']!),
+                                style: AppTheme.dataFont(color: Colors.white70, fontSize: 13),
+                              ),
+                            ],
+                          ),
                       ],
                     ),
                   ),
                 ),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: 24),
 
               if (_isOrganizer) ...[
-                const SizedBox(height: 24),
-                const Text('Precios al Público (Referencia)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)),
-                const SizedBox(height: 16),
+                Text('PRECIOS REFERENCIA PÚBLICO', style: AppTheme.subheadFont(color: Colors.white, fontSize: 18)),
+                const SizedBox(height: 12),
                 Container(
                   padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.grey[200]!)),
-                  child: const Column(
+                  decoration: BoxDecoration(color: AppTheme.camimAsh, border: Border.all(color: Colors.white12)),
+                  child: Column(
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(children: [Icon(Icons.confirmation_num, color: Colors.red, size: 20), SizedBox(width: 12), Text('Entrada General:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))]),
-                          Text('\$3.000', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: Colors.black)),
+                          Row(children: [const Icon(Icons.confirmation_num, color: Colors.white54, size: 20), const SizedBox(width: 12), Text('ENTRADA GENERAL', style: AppTheme.dataFont(color: Colors.white))]),
+                          Text('\$3.000', style: AppTheme.dataFont(color: Colors.white, fontSize: 16)),
                         ],
                       ),
-                      Divider(height: 30),
+                      const Divider(height: 30, color: Colors.white12),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(children: [Icon(Icons.directions_car, color: Colors.blue, size: 20), SizedBox(width: 12), Text('Estacionamiento:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))]),
-                          Text('\$1.000', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: Colors.black)),
+                          Row(children: [const Icon(Icons.directions_car, color: Colors.white54, size: 20), const SizedBox(width: 12), Text('ESTACIONAMIENTO', style: AppTheme.dataFont(color: Colors.white))]),
+                          Text('\$1.000', style: AppTheme.dataFont(color: Colors.white, fontSize: 16)),
                         ],
                       ),
                     ],
@@ -395,103 +378,62 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ],
 
               if (!_isOrganizer) ...[
-                const SizedBox(height: 16),
-                const Text('Información Útil', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)),
-                const SizedBox(height: 16),
-                
-                GridView.count(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
-                  childAspectRatio: 1.2,
-                  children: [
-                    _ActionCard(icon: Icons.article_outlined, title: 'Reglamentos', color: Colors.blue, onTap: () => context.push('/regulations')),
-                    _ActionCard(icon: Icons.attach_money, title: 'Costos\nInscripción', color: Colors.green, onTap: () => context.push('/costs')),
-                    _ActionCard(icon: Icons.history, title: 'Fechas y\nResultados', color: Colors.orange, onTap: () => context.push('/dates_history')),
-                    _ActionCard(icon: Icons.live_tv, title: 'Evento\nen Vivo', color: Colors.red, onTap: () => context.push('/live_event')),
-                  ],
-                ),
-
-                const SizedBox(height: 16),
-                InkWell(
-                  onTap: () => context.push('/ranking'),
-                  borderRadius: BorderRadius.circular(16),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-                    decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(16)),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.emoji_events, color: Colors.amber, size: 22),
-                        SizedBox(width: 8),
-                        Text('Ver Rankings Generales', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                      ],
-                    ),
-                  ),
-                ),
-                
-                const SizedBox(height: 36),
-                const Text('Novedades', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)),
-                const SizedBox(height: 16),
-                
+                // INVITACIÓN A INSCRIPCIÓN (Novedades)
                 InkWell(
                   onTap: () => context.push('/pre_inscription'),
-                  borderRadius: BorderRadius.circular(16),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFFE53935), Color(0xFFB71C1C)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.red.withOpacity(0.3),
-                          blurRadius: 12,
-                          offset: const Offset(0, 6),
-                        )
-                      ],
+                      color: AppTheme.camimRed,
+                      border: Border.all(color: Colors.redAccent, width: 1),
                     ),
                     child: Row(
                       children: [
-                         Container(
-                           height: 50, width: 50,
-                           decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(14)),
-                           child: const Icon(Icons.app_registration, color: Colors.white, size: 28),
-                         ),
+                         const Icon(Icons.app_registration, color: Colors.white, size: 32),
                          const SizedBox(width: 20),
-                         const Expanded(
-                           child: Text(
-                             '¡INSCRIPCIONES ABIERTAS!', 
-                             style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: Colors.white, letterSpacing: 0.5)
-                           ),
+                         Expanded(
+                           child: Column(
+                             crossAxisAlignment: CrossAxisAlignment.start,
+                             children: [
+                               Text('INSCRIPCIONES', style: AppTheme.dataFont(color: Colors.white70, fontSize: 10).copyWith(letterSpacing: 2)),
+                               Text('PRE-INSCRIPCIÓN\nABIERTA', style: AppTheme.displayFont(color: Colors.white, fontSize: 20).copyWith(height: 1.1)),
+                             ],
+                           )
                          ),
-                         const Icon(Icons.arrow_forward_ios, color: Colors.white70, size: 18)
+                         const Icon(Icons.arrow_forward_ios, color: Colors.white, size: 18)
                       ],
                     ),
                   ),
+                ),
+                const SizedBox(height: 32),
+
+                Text('INFORMACIÓN ÚTIL', style: AppTheme.subheadFont(color: Colors.white, fontSize: 18)),
+                const SizedBox(height: 12),
+                
+                // Reemplazamos los rectángulos enormes por barras horizontales fluidas
+                Column(
+                  children: [
+                    _SleekTile(icon: Icons.article_outlined, title: 'REGLAMENTOS OFICIALES', onTap: () => context.push('/regulations')),
+                    _SleekTile(icon: Icons.attach_money, title: 'COSTOS DE INSCRIPCIÓN', onTap: () => context.push('/costs')),
+                    _SleekTile(icon: Icons.history, title: 'FECHAS Y RESULTADOS', onTap: () => context.push('/dates_history')),
+                    _SleekTile(icon: Icons.live_tv, title: 'TIEMPOS EN VIVO', highlight: true, onTap: () => context.push('/live_event')),
+                    const SizedBox(height: 16),
+                    _SleekTile(icon: Icons.emoji_events, title: 'RANKINGS GENERALES', isGold: true, onTap: () => context.push('/ranking')),
+                  ],
                 ),
               ],
 
               if (_upcomingBirthdays.isNotEmpty) ...[
-                const SizedBox(height: 24),
+                const SizedBox(height: 36),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Cumpleaños del Mes 🎂', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)),
-                    TextButton(
-                      onPressed: () => context.push('/birthday_calendar'),
-                      child: const Text('Ver Calendario', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 13)),
-                    ),
+                    Text('CUMPLEAÑOS DEL MES', style: AppTheme.subheadFont(color: Colors.white, fontSize: 18)),
                   ],
                 ),
                 const SizedBox(height: 12),
                 SizedBox(
-                  height: 100,
+                  height: 90,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemCount: _upcomingBirthdays.length,
@@ -499,29 +441,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       final pilot = _upcomingBirthdays[index];
                       final isToday = pilot['isToday'] == true;
                       return Container(
-                        width: 160,
+                        width: 220,
                         margin: const EdgeInsets.only(right: 12),
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: isToday ? Colors.red[50] : Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: isToday ? Colors.red[100]! : Colors.grey[200]!),
+                          color: isToday ? AppTheme.camimRed.withOpacity(0.1) : AppTheme.camimAsh,
+                          border: Border.all(color: isToday ? AppTheme.camimRed : Colors.white12),
                         ),
                         child: Row(
                           children: [
-                            CircleAvatar(
-                              radius: 20,
-                              backgroundImage: pilot['photo_url'] != null ? NetworkImage(pilot['photo_url']) : null,
-                              child: pilot['photo_url'] == null ? const Icon(Icons.person, size: 20) : null,
+                            Container(
+                              width: 40, height: 40,
+                              decoration: BoxDecoration(
+                                color: Colors.white10,
+                                image: pilot['photo_url'] != null ? DecorationImage(image: NetworkImage(pilot['photo_url']), fit: BoxFit.cover) : null,
+                              ),
+                              child: pilot['photo_url'] == null ? const Icon(Icons.person, color: Colors.white30, size: 20) : null,
                             ),
-                            const SizedBox(width: 10),
+                            const SizedBox(width: 12),
                             Expanded(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(pilot['first_name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), overflow: TextOverflow.ellipsis),
-                                  Text(isToday ? '¡HOY! 🎉' : '${pilot['day']} de este mes', style: TextStyle(color: isToday ? Colors.red : Colors.grey, fontSize: 10, fontWeight: FontWeight.bold)),
+                                  Text(pilot['first_name'].toString().toUpperCase(), style: AppTheme.dataFont(color: Colors.white, fontSize: 12), overflow: TextOverflow.ellipsis),
+                                  const SizedBox(height: 4),
+                                  Text(isToday ? '¡HOY! 🎉' : 'DÍA ${pilot['day']}', style: AppTheme.dataFont(color: isToday ? AppTheme.camimRed : Colors.white54, fontSize: 10)),
                                 ],
                               ),
                             ),
@@ -534,35 +479,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ],
 
               if (_isAdmin) ...[
-                const SizedBox(height: 36),
-                const Text('Panel Administrador', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black)),
-                const SizedBox(height: 16),
-                Row(
+                const SizedBox(height: 40),
+                Text('PANEL ADMINISTRADOR', style: AppTheme.subheadFont(color: Colors.white, fontSize: 18)),
+                const SizedBox(height: 12),
+                Column(
                  children: [
-                   Expanded(child: _ActionCard(icon: Icons.people_alt, title: 'Pilotos', color: Colors.purple, onTap: () => context.push('/admin_pilots'), compact: true)),
-                   const SizedBox(width: 8),
-                   Expanded(child: _ActionCard(icon: Icons.calendar_today, title: 'Fechas', color: Colors.teal, onTap: () => context.push('/admin_dates_list'), compact: true)),
-                   const SizedBox(width: 8),
-                   Expanded(child: _ActionCard(icon: Icons.videocam, title: 'Vivo', color: Colors.red, onTap: () => context.push('/admin_live_event'), compact: true)),
-                   const SizedBox(width: 8),
-                   Expanded(child: _ActionCard(icon: Icons.notifications_active, title: 'Notif.', color: Colors.amber, onTap: () => context.push('/admin_notifications'), compact: true, showBadge: _hasNewNotifications)),
+                   _AdminSleekTile(icon: Icons.people_alt, title: 'GESTIÓN DE PILOTOS', onTap: () => context.push('/admin_pilots')),
+                   _AdminSleekTile(icon: Icons.calendar_today, title: 'GESTIÓN DE FECHAS', onTap: () => context.push('/admin_dates_list')),
+                   _AdminSleekTile(icon: Icons.videocam, title: 'CONTROL EN VIVO', onTap: () => context.push('/admin_live_event')),
+                   _AdminSleekTile(icon: Icons.notifications_active, title: 'NOTIFICACIONES PUSH', onTap: () => context.push('/admin_notifications'), showBadge: _hasNewNotifications),
                  ],
                 ),
               ],
               
-              const SizedBox(height: 40),
+              const SizedBox(height: 80), // Margen para el botón flotante
             ],
           ),
         )
       )
     );
   }
-  Widget _buildStatItem(String label, String value) {
+
+  Widget _buildStatItem(String label, String value, {bool highlight = false}) {
     return Column(
       children: [
-        Text(label, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+        Text(label, style: AppTheme.dataFont(color: Colors.white54, fontSize: 10)),
         const SizedBox(height: 4),
-        Text(value, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+        Text(value, style: AppTheme.displayFont(color: highlight ? AppTheme.camimRed : Colors.white, fontSize: 22).copyWith(height: 1)),
       ],
     );
   }
@@ -577,80 +520,93 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void _showQRModal() {
     if (_qrCode == null || _qrCode!.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No tienes un código QR asignado.')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No tienes un código QR asignado.'), backgroundColor: AppTheme.camimRed));
       return;
     }
     showQRModal(context, _qrCode!);
   }
 }
 
-class _ActionCard extends StatelessWidget {
+// Reemplazo visual de _ActionCard para los menús
+class _SleekTile extends StatelessWidget {
   final IconData icon;
   final String title;
-  final MaterialColor color;
-  final VoidCallback? onTap;
-  final bool compact;
+  final VoidCallback onTap;
+  final bool highlight;
+  final bool isGold;
+
+  const _SleekTile({required this.icon, required this.title, required this.onTap, this.highlight = false, this.isGold = false});
+
+  @override
+  Widget build(BuildContext context) {
+    Color baseColor = isGold ? const Color(0xFFD4AF37) : (highlight ? AppTheme.camimRed : Colors.white70);
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        decoration: BoxDecoration(
+          color: AppTheme.camimAsh,
+          border: Border.all(color: isGold ? baseColor.withOpacity(0.3) : Colors.white12),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: baseColor, size: 24),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                title, 
+                style: AppTheme.dataFont(color: highlight || isGold ? Colors.white : Colors.white70, fontSize: 13),
+              ),
+            ),
+            Icon(Icons.arrow_forward_ios, color: Colors.white24, size: 14),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AdminSleekTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final VoidCallback onTap;
   final bool showBadge;
 
-  const _ActionCard({required this.icon, required this.title, required this.color, this.onTap, this.compact = false, this.showBadge = false});
+  const _AdminSleekTile({required this.icon, required this.title, required this.onTap, this.showBadge = false});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: compact ? const EdgeInsets.all(12) : const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         decoration: BoxDecoration(
-          color: compact ? Colors.black : Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: compact ? Colors.grey[900]! : Colors.grey[200]!),
-          boxShadow: compact ? [] : [
-            BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4))
+          color: Colors.white.withOpacity(0.05),
+          border: Border.all(color: Colors.white12),
+        ),
+        child: Row(
+          children: [
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Icon(icon, color: Colors.white54, size: 24),
+                if (showBadge)
+                  Positioned(
+                    right: -2,
+                    top: -2,
+                    child: Container(width: 8, height: 8, decoration: const BoxDecoration(color: AppTheme.camimRed, shape: BoxShape.circle)),
+                  ),
+              ],
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(title, style: AppTheme.dataFont(color: Colors.white, fontSize: 12)),
+            ),
+            const Icon(Icons.arrow_forward_ios, color: Colors.white24, size: 14),
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: compact ? Colors.white.withOpacity(0.1) : color.shade50, 
-                borderRadius: BorderRadius.circular(12)
-              ),
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Icon(icon, color: color, size: compact ? 22 : 32),
-                  if (showBadge)
-                    Positioned(
-                      right: -2,
-                      top: -2,
-                      child: Container(
-                        width: 10,
-                        height: 10,
-                        decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              title, 
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontWeight: FontWeight.w700, 
-                fontSize: compact ? 11 : 13, 
-                color: compact ? Colors.white : Colors.black,
-                height: 1.1,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        )
       ),
     );
   }
