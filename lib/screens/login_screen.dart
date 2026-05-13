@@ -95,7 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 12),
               RichText(
                 text: TextSpan(
-                  style: AppTheme.displayFont(color: Colors.white, fontSize: 56).copyWith(lineHeight: 0.9),
+                  style: AppTheme.displayFont(color: Colors.white, fontSize: 56).copyWith(height: 0.9),
                   children: const [
                     TextSpan(text: 'PADDOCK\n'),
                     TextSpan(text: 'VIRTUAL.', style: TextStyle(color: AppTheme.camimRed)),

@@ -161,7 +161,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         Text(
                           name.toUpperCase(),
-                          style: AppTheme.displayFont(color: Colors.white, fontSize: 32).copyWith(lineHeight: 1),
+                          style: AppTheme.displayFont(color: Colors.white, fontSize: 32).copyWith(height: 1),
                         ),
                         if (moto.isNotEmpty || num.isNotEmpty)
                           Padding(
