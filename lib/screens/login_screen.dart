@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../theme/app_theme.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,7 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _login() async {
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor ingresa correo y contraseña'), backgroundColor: Colors.red),
+        const SnackBar(content: Text('Por favor ingresa correo y contraseña'), backgroundColor: AppTheme.camimRed),
       );
       return;
     }
@@ -34,18 +35,18 @@ class _LoginScreenState extends State<LoginScreen> {
       if (mounted) {
         if (e.message.contains('Invalid login')) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Correo o contraseña incorrectos.'), backgroundColor: Colors.red),
+            const SnackBar(content: Text('Correo o contraseña incorrectos.'), backgroundColor: AppTheme.camimRed),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.message), backgroundColor: Colors.red),
+            SnackBar(content: Text(e.message), backgroundColor: AppTheme.camimRed),
           );
         }
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error inesperado: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text('Error inesperado: $e'), backgroundColor: AppTheme.camimRed),
         );
       }
     } finally {
@@ -56,121 +57,134 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppTheme.camimInk,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 40.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Logo superior
-               Center(
-                 child: Image.asset(
-                    'assets/images/logo.png',
-                    height: 80,
-                    errorBuilder: (context, error, stackTrace) => const Text(
-                      'CAMIM', 
-                      style: TextStyle(fontSize: 32, fontWeight: FontWeight.w900, fontStyle: FontStyle.italic)
+              // Meta info superior (Chip style)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'CAMIM · APP',
+                    style: AppTheme.dataFont(color: Colors.white70, fontSize: 12).copyWith(letterSpacing: 2),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.white30, width: 1.5),
+                      borderRadius: BorderRadius.circular(999),
                     ),
-                 ),
-               ),
-              const SizedBox(height: 50),
+                    child: Text(
+                      'V0.1',
+                      style: AppTheme.dataFont(color: Colors.white, fontSize: 11).copyWith(letterSpacing: 2),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 60),
               
-              // Textos centrales
-              const Text(
-                'Ingresar o crear cuenta',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
+              // Textos centrales / Hero
+              Text(
+                '◆ ACCESO OFICIAL',
+                style: AppTheme.dataFont(color: AppTheme.camimRed, fontSize: 11).copyWith(letterSpacing: 2),
+              ),
+              const SizedBox(height: 12),
+              RichText(
+                text: TextSpan(
+                  style: AppTheme.displayFont(color: Colors.white, fontSize: 56).copyWith(lineHeight: 0.9),
+                  children: const [
+                    TextSpan(text: 'PADDOCK\n'),
+                    TextSpan(text: 'VIRTUAL.', style: TextStyle(color: AppTheme.camimRed)),
+                  ],
                 ),
               ),
-              const SizedBox(height: 8),
-              Text(
-                'Ingresa tu email y contraseña para entrar a la aplicación',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-              ),
               const SizedBox(height: 16),
-              const SizedBox(height: 20),
+              Text(
+                'Ingresa tus credenciales para acceder a la gestión del campeonato.',
+                style: AppTheme.bodyFont(color: Colors.white70, fontSize: 16),
+              ),
+              const SizedBox(height: 40),
 
               // Campo Email
               TextField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
-                style: const TextStyle(color: Colors.black),
+                style: AppTheme.bodyFont(color: Colors.white),
+                cursorColor: AppTheme.camimRed,
                 decoration: InputDecoration(
-                  hintText: 'usuario@gmail.com',
-                  hintStyle: TextStyle(color: Colors.grey[400]),
+                  hintText: 'usuario@correo.com',
+                  hintStyle: AppTheme.bodyFont(color: Colors.white38),
                   filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                  fillColor: AppTheme.camimAsh,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.grey[300]!),
+                    borderRadius: BorderRadius.circular(0), // Bordes duros
+                    borderSide: const BorderSide(color: Colors.white12),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: Colors.black),
+                    borderRadius: BorderRadius.circular(0),
+                    borderSide: const BorderSide(color: AppTheme.camimRed, width: 2),
                   ),
                 ),
               ),
               const SizedBox(height: 16),
               
-              // Campo Contraseña (Añadido para mantener la seguridad estructural)
+              // Campo Contraseña
               TextField(
                 controller: _passwordController,
                 obscureText: true,
-                style: const TextStyle(color: Colors.black),
+                style: AppTheme.bodyFont(color: Colors.white),
+                cursorColor: AppTheme.camimRed,
                 decoration: InputDecoration(
                   hintText: 'Contraseña',
-                  hintStyle: TextStyle(color: Colors.grey[400]),
+                  hintStyle: AppTheme.bodyFont(color: Colors.white38),
                   filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                  fillColor: AppTheme.camimAsh,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.grey[300]!),
+                    borderRadius: BorderRadius.circular(0),
+                    borderSide: const BorderSide(color: Colors.white12),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: Colors.black),
+                    borderRadius: BorderRadius.circular(0),
+                    borderSide: const BorderSide(color: AppTheme.camimRed, width: 2),
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
 
-              // Botón Continuar (Negro pleno)
+              // Botón Continuar
               ElevatedButton(
                 onPressed: _isLoading ? null : _login,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
+                  backgroundColor: AppTheme.camimRed,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  shape: const ContinuousRectangleBorder(),
                   elevation: 0,
                 ),
                 child: _isLoading 
                     ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                    : const Text('Continuar', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                    : Text('INICIAR SESIÓN', style: AppTheme.dataFont(fontSize: 14)),
               ),
               
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               // Enlace resaltado para ir a registro
               Center(
                 child: TextButton(
                   onPressed: () => context.push('/register'),
                   child: RichText(
-                    text: const TextSpan(
-                      style: TextStyle(fontSize: 14),
-                      children: [
-                        TextSpan(text: '¿Aún no tienes cuenta? ', style: TextStyle(color: Colors.black)),
+                    text: TextSpan(
+                      style: AppTheme.bodyFont(color: Colors.white70, fontSize: 14),
+                      children: const [
+                        TextSpan(text: '¿Aún no tienes cuenta? '),
                         TextSpan(
                           text: 'Regístrate aquí', 
-                          style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, decoration: TextDecoration.underline)
+                          style: TextStyle(color: AppTheme.camimRed, fontWeight: FontWeight.bold)
                         ),
                       ],
                     ),
@@ -178,95 +192,24 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
 
-              const SizedBox(height: 20),
-              
-              // Linea con "o"
-              Row(
-                children: [
-                  Expanded(child: Divider(color: Colors.grey[300], thickness: 1)),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Text('o', style: TextStyle(color: Colors.grey[400])),
-                  ),
-                  Expanded(child: Divider(color: Colors.grey[300], thickness: 1)),
-                ],
-              ),
-              const SizedBox(height: 20),
-
-              // Botones sociales
-              _SocialButton(
-                text: 'Continuar con Google',
-                iconData: Icons.g_mobiledata, 
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Próximamente')));
-                },
-              ),
-              const SizedBox(height: 12),
-              _SocialButton(
-                text: 'Continuar con Apple',
-                iconData: Icons.apple,
-                iconSize: 24,
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Próximamente')));
-                },
-              ),
               const SizedBox(height: 40),
-
+              
               // Textos Legales
               RichText(
                 textAlign: TextAlign.center,
                 text: TextSpan(
-                  style: TextStyle(color: Colors.grey[500], fontSize: 12, height: 1.5),
+                  style: AppTheme.dataFont(color: Colors.white38, fontSize: 10).copyWith(height: 1.5),
                   children: const [
-                    TextSpan(text: 'By clicking continue, you agree to our '),
-                    TextSpan(text: 'Terms of Service\n', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600)),
-                    TextSpan(text: 'and '),
-                    TextSpan(text: 'Privacy Policy', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600)),
+                    TextSpan(text: 'AL INGRESAR, ACEPTAS NUESTROS\n'),
+                    TextSpan(text: 'TÉRMINOS DE SERVICIO', style: TextStyle(color: Colors.white)),
+                    TextSpan(text: ' Y '),
+                    TextSpan(text: 'POLÍTICA DE PRIVACIDAD', style: TextStyle(color: Colors.white)),
                   ],
                 ),
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-// Widget auxiliar para los botones de Apple y Google
-class _SocialButton extends StatelessWidget {
-  final String text;
-  final IconData iconData;
-  final VoidCallback onPressed;
-  final double iconSize;
-
-  const _SocialButton({
-    required this.text,
-    required this.iconData,
-    required this.onPressed,
-    this.iconSize = 34,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFFF1F1F1), // Gris ultra claro (estética iOS)
-        foregroundColor: Colors.black, // Texto negro
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(iconData, size: iconSize, color: Colors.black),
-          const SizedBox(width: 8),
-          Text(text, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
-        ],
       ),
     );
   }

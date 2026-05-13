@@ -76,12 +76,13 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(backgroundColor: AppTheme.camimInk, body: Center(child: CircularProgressIndicator(color: AppTheme.camimRed)));
     }
 
     if (_profile == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Error')),
+        backgroundColor: AppTheme.camimInk,
+        appBar: AppBar(title: const Text('ERROR')),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(24.0),
@@ -90,17 +91,17 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 const Icon(Icons.warning_amber_rounded, size: 60, color: AppTheme.camimRed),
                 const SizedBox(height: 20),
-                const Text('Hubo un problema con tu perfil de la base de datos.', textAlign: TextAlign.center),
+                Text('Hubo un problema con tu perfil.', textAlign: TextAlign.center, style: AppTheme.bodyFont(color: Colors.white)),
                 const SizedBox(height: 10),
                 Text(
                   _errorMessage ?? 'Cargando...',
-                  style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                  style: AppTheme.dataFont(color: AppTheme.camimRed),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 30),
-                ElevatedButton(onPressed: _loadProfile, child: const Text('Reintentar de Nuevo')),
+                ElevatedButton(onPressed: _loadProfile, child: const Text('REINTENTAR')),
                 const SizedBox(height: 10),
-                TextButton(onPressed: _logout, child: const Text('Cerrar sesión', style: TextStyle(color: AppTheme.camimBlue))),
+                TextButton(onPressed: _logout, child: Text('Cerrar sesión', style: AppTheme.dataFont(color: AppTheme.camimBlue))),
               ],
             ),
           ),
@@ -118,14 +119,17 @@ class _HomeScreenState extends State<HomeScreen> {
     final String birthplace = _profile!['birthplace'] ?? '';
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppTheme.camimInk,
       appBar: AppBar(
-        title: Text(role.toUpperCase(), style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
+        title: Text(
+          '◆ PERFIL / ${role.toUpperCase()}', 
+          style: AppTheme.dataFont(color: AppTheme.camimRed, fontSize: 13).copyWith(letterSpacing: 2)
+        ),
+        backgroundColor: AppTheme.camimInk,
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout, color: Colors.black),
+            icon: const Icon(Icons.logout, color: Colors.white70),
             onPressed: _logout,
           )
         ],
@@ -136,144 +140,165 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Center(
-                child: CircleAvatar(
-                  radius: 50,
-                  backgroundColor: Colors.grey[200],
-                  backgroundImage: photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
-                  child: photoUrl.isEmpty ? const Icon(Icons.person, size: 60, color: Colors.grey) : null,
+              // Hero Section - Foto + Nombre
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      color: AppTheme.camimAsh,
+                      border: Border.all(color: Colors.white12, width: 2),
+                      image: photoUrl.isNotEmpty ? DecorationImage(image: NetworkImage(photoUrl), fit: BoxFit.cover) : null,
+                    ),
+                    child: photoUrl.isEmpty ? const Icon(Icons.person, size: 50, color: Colors.white30) : null,
+                  ),
+                  const SizedBox(width: 20),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          name.toUpperCase(),
+                          style: AppTheme.displayFont(color: Colors.white, fontSize: 32).copyWith(lineHeight: 1),
+                        ),
+                        if (moto.isNotEmpty || num.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Row(
+                              children: [
+                                if (num.isNotEmpty)
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    color: AppTheme.camimRed,
+                                    child: Text(
+                                      '#$num',
+                                      style: AppTheme.displayFont(color: Colors.white, fontSize: 18),
+                                    ),
+                                  ),
+                                if (num.isNotEmpty) const SizedBox(width: 8),
+                                if (moto.isNotEmpty)
+                                  Expanded(
+                                    child: Text(
+                                      moto.toUpperCase(),
+                                      style: AppTheme.subheadFont(color: Colors.white70, fontSize: 20),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              
+              // Edit button
+              OutlinedButton.icon(
+                onPressed: _editProfile, 
+                icon: const Icon(Icons.edit, color: Colors.white, size: 16),
+                label: Text('EDITAR PERFIL', style: AppTheme.dataFont(color: Colors.white, fontSize: 12)),
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colors.white24),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: const ContinuousRectangleBorder(),
                 ),
               ),
-              const SizedBox(height: 16),
-              Text(
-                _formatName(name),
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black),
-              ),
-              if (moto.isNotEmpty || num.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: Text(
-                    '${moto.isNotEmpty ? moto : ''} ${num.isNotEmpty ? ' | #$num' : ''}',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.bold),
-                  ),
-                ),
-              if (birthplace.isNotEmpty || birthdate.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(top: 4.0),
-                  child: Text(
-                    [if(birthplace.isNotEmpty) birthplace, if(birthdate.isNotEmpty) birthdate].join(' - '),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey[500], fontSize: 12),
-                  ),
-                ),
-              const SizedBox(height: 16),
-              Center(
-                child: TextButton.icon(
-                  onPressed: _editProfile, 
-                  icon: const Icon(Icons.edit, color: Colors.black, size: 16),
-                  label: const Text('Editar Perfil', style: TextStyle(color: Colors.black)),
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                    backgroundColor: Colors.grey[100],
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20))
-                  ),
-                ),
-              ),
+              
               const SizedBox(height: 40),
               
               if (role == 'pilot' && qrCode.isNotEmpty) ...[
-                const Text('CÓDIGO DE INGRESO A PISTA:', textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.w900, color: Colors.black, fontSize: 16)),
+                Text('◆ CÓDIGO DE INGRESO PADDOCK', style: AppTheme.dataFont(color: AppTheme.camimRed, fontSize: 12)),
                 const SizedBox(height: 12),
-                Center(
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.grey[200]!, width: 2),
-                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
-                    ),
-                    child: Column(
-                      children: [
-                        QrImageView(
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: AppTheme.camimAsh,
+                    border: Border.all(color: Colors.white12, width: 2),
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        color: Colors.white,
+                        child: QrImageView(
                           data: qrCode,
                           version: QrVersions.auto,
                           size: 200.0,
                           backgroundColor: Colors.white,
                         ),
-                        const SizedBox(height: 8),
-                        Text(qrCode, style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 2, fontSize: 12, color: Colors.grey)),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(qrCode, style: AppTheme.dataFont(color: Colors.white70, fontSize: 14).copyWith(letterSpacing: 3)),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 20),
-                Text('Coloca el brillo de tu pantalla al máximo al momento de escanearlo en la puerta.', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+                const SizedBox(height: 16),
+                Text('Coloca el brillo al máximo para escanear en puerta.', textAlign: TextAlign.center, style: AppTheme.bodyFont(color: Colors.white38, fontSize: 13)),
               ] 
               else if (role == 'admin') ...[
-                ElevatedButton.icon(
-                  onPressed: () => context.push('/scanner'),
-                  icon: const Icon(Icons.qr_code_scanner),
-                  label: const Text('ESCANEAR INGRESO DE PILOTO'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    backgroundColor: Colors.black,
-                    foregroundColor: Colors.white,
-                  ),
+                _AdminActionCard(
+                  title: 'ESCANEAR INGRESO',
+                  subtitle: 'Control de paddock',
+                  icon: Icons.qr_code_scanner,
+                  color: AppTheme.camimRed,
+                  onTap: () => context.push('/scanner'),
                 ),
-                const SizedBox(height: 12),
-                // Buscar evento activo para ver logs
+                const SizedBox(height: 16),
                 FutureBuilder<Map<String, dynamic>?>(
                   future: Supabase.instance.client.from('events').select('id, title').eq('is_active', true).maybeSingle(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData && snapshot.data != null) {
-                      return TextButton.icon(
-                        onPressed: () => context.push('/admin_check_in_logs', extra: {
+                      return _AdminActionCard(
+                        title: 'LISTA DE INGRESOS',
+                        subtitle: 'Logs de pilotos (Hoy)',
+                        icon: Icons.list_alt,
+                        color: AppTheme.camimAsh,
+                        onTap: () => context.push('/admin_check_in_logs', extra: {
                           'eventId': snapshot.data!['id'].toString(),
                           'eventTitle': snapshot.data!['title']
                         }),
-                        icon: const Icon(Icons.list_alt, color: Colors.blue),
-                        label: const Text('VER LISTA DE INGRESOS (HOY)', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold)),
                       );
                     }
                     return const SizedBox.shrink();
                   },
                 ),
-                const SizedBox(height: 20),
-                ElevatedButton.icon(
-                  onPressed: () => context.push('/championships'),
-                  icon: const Icon(Icons.emoji_events),
-                  label: const Text('GESTIONAR CAMPEONATOS'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    backgroundColor: Colors.grey[200],
-                    foregroundColor: Colors.black,
-                  ),
+                const SizedBox(height: 16),
+                _AdminActionCard(
+                  title: 'CAMPEONATOS',
+                  subtitle: 'Gestionar temporadas',
+                  icon: Icons.emoji_events,
+                  color: AppTheme.camimAsh,
+                  onTap: () => context.push('/championships'),
                 ),
-                const SizedBox(height: 12),
-                ElevatedButton.icon(
-                  onPressed: () => context.push('/admin_live_event'),
-                  icon: const Icon(Icons.live_tv, color: Colors.blue),
-                  label: const Text('GESTIONAR EN VIVO'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    backgroundColor: Colors.blue[50],
-                    foregroundColor: Colors.blue[900],
-                  ),
+                const SizedBox(height: 16),
+                _AdminActionCard(
+                  title: 'EN VIVO',
+                  subtitle: 'Gestión de fecha actual',
+                  icon: Icons.live_tv,
+                  color: AppTheme.camimBlue,
+                  onTap: () => context.push('/admin_live_event'),
                 ),
               ] else if (role == 'spectator') ...[
                 Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(color: Colors.black.withOpacity(0.05), borderRadius: BorderRadius.circular(16)),
-                  child: const Column(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: AppTheme.camimAsh,
+                    border: Border.all(color: Colors.white12, width: 2),
+                  ),
+                  child: Column(
                     children: [
-                      Icon(Icons.confirmation_num_outlined, size: 40, color: Colors.black),
-                      SizedBox(height: 10),
-                      Text('Has ingresado como Espectador', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                      SizedBox(height: 5),
-                      Text('Compra tus entradas directo en puerta, y sigue el campeonato oficial desde esta app.', textAlign: TextAlign.center),
+                      const Icon(Icons.confirmation_num_outlined, size: 48, color: Colors.white54),
+                      const SizedBox(height: 16),
+                      Text('ACCESO ESPECTADOR', style: AppTheme.subheadFont(color: Colors.white, fontSize: 24)),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Compra tus entradas en puerta y sigue los tiempos en vivo desde esta app.', 
+                        textAlign: TextAlign.center,
+                        style: AppTheme.bodyFont(color: Colors.white70),
+                      ),
                     ]
                   )
                 )
@@ -291,5 +316,51 @@ class _HomeScreenState extends State<HomeScreen> {
       if (str.isEmpty) return str;
       return str[0].toUpperCase() + str.substring(1).toLowerCase();
     }).join(' ');
+  }
+}
+
+class _AdminActionCard extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _AdminActionCard({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: color == AppTheme.camimAsh ? AppTheme.camimAsh : color.withOpacity(0.1),
+          border: Border.all(color: color == AppTheme.camimAsh ? Colors.white12 : color.withOpacity(0.5), width: 2),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 32, color: color == AppTheme.camimAsh ? Colors.white70 : color),
+            const SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: AppTheme.subheadFont(color: Colors.white, fontSize: 24)),
+                  Text(subtitle, style: AppTheme.dataFont(color: Colors.white54, fontSize: 10)),
+                ],
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.white30),
+          ],
+        ),
+      ),
+    );
   }
 }
