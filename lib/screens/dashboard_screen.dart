@@ -405,6 +405,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 16),
+                
+                // RANKINGS GENERALES
+                _SleekTile(
+                  icon: Icons.emoji_events, 
+                  title: 'RANKINGS GENERALES', 
+                  isGold: true, 
+                  onTap: () => context.push('/ranking')
+                ),
                 const SizedBox(height: 32),
 
                 Text('INFORMACIÓN ÚTIL', style: AppTheme.subheadFont(color: Colors.white, fontSize: 18)),
@@ -417,8 +426,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     _SleekTile(icon: Icons.attach_money, title: 'COSTOS DE INSCRIPCIÓN', onTap: () => context.push('/costs')),
                     _SleekTile(icon: Icons.history, title: 'FECHAS Y RESULTADOS', onTap: () => context.push('/dates_history')),
                     _SleekTile(icon: Icons.live_tv, title: 'TIEMPOS EN VIVO', highlight: true, onTap: () => context.push('/live_event')),
-                    const SizedBox(height: 16),
-                    _SleekTile(icon: Icons.emoji_events, title: 'RANKINGS GENERALES', isGold: true, onTap: () => context.push('/ranking')),
                   ],
                 ),
               ],

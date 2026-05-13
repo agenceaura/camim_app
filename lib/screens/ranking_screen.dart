@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../theme/app_theme.dart';
 
 class RankingScreen extends StatefulWidget {
   const RankingScreen({super.key});
@@ -110,44 +111,47 @@ class _RankingScreenState extends State<RankingScreen> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: AppTheme.camimInk,
       appBar: AppBar(
-        title: const Text('RANKING 2026', style: TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: 1.5)),
-        backgroundColor: Colors.white,
-        centerTitle: true,
+        title: Text('◆ RANKINGS', style: AppTheme.dataFont(color: Colors.white, fontSize: 16).copyWith(letterSpacing: 2)),
+        backgroundColor: AppTheme.camimInk,
+        centerTitle: false,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: const IconThemeData(color: Colors.white),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(110),
           child: Column(
             children: [
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                height: 40,
+                height: 44,
                 child: TextField(
                   controller: _searchController,
                   onChanged: _filterRankings,
-                  style: const TextStyle(color: Colors.black, fontSize: 14),
+                  style: AppTheme.bodyFont(color: Colors.white, fontSize: 14),
+                  cursorColor: AppTheme.camimRed,
                   decoration: InputDecoration(
-                    hintText: 'Buscar piloto o número...',
-                    hintStyle: TextStyle(color: Colors.grey[400], fontSize: 13),
-                    prefixIcon: const Icon(Icons.search, size: 18, color: Colors.grey),
+                    hintText: 'Buscar piloto o N° de moto...',
+                    hintStyle: AppTheme.bodyFont(color: Colors.white38, fontSize: 13),
+                    prefixIcon: const Icon(Icons.search, size: 18, color: Colors.white54),
                     filled: true,
-                    fillColor: Colors.grey[100],
+                    fillColor: AppTheme.camimAsh,
                     contentPadding: EdgeInsets.zero,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                    enabledBorder: const OutlineInputBorder(borderSide: BorderSide(color: Colors.white12), borderRadius: BorderRadius.zero),
+                    focusedBorder: const OutlineInputBorder(borderSide: BorderSide(color: AppTheme.camimRed, width: 2), borderRadius: BorderRadius.zero),
                   ),
                 ),
               ),
               TabBar(
                 controller: _tabController,
                 isScrollable: true,
-                indicatorColor: Colors.red,
-                indicatorWeight: 3,
-                labelColor: Colors.black,
-                unselectedLabelColor: Colors.black54,
-                labelStyle: const TextStyle(fontWeight: FontWeight.w900, fontSize: 12, letterSpacing: 0.5),
-                unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal, fontSize: 12),
+                indicatorColor: AppTheme.camimRed,
+                indicatorWeight: 4,
+                labelColor: Colors.white,
+                unselectedLabelColor: Colors.white54,
+                labelStyle: AppTheme.dataFont(fontSize: 12),
+                unselectedLabelStyle: AppTheme.dataFont(fontSize: 12),
+                tabAlignment: TabAlignment.start,
                 tabs: _categories.map((c) => Tab(text: c.toUpperCase())).toList(),
               ),
             ],
@@ -165,7 +169,7 @@ class _RankingScreenState extends State<RankingScreen> with SingleTickerProvider
     final list = _filteredRankingsByCat[category];
 
     if (list == null && _isLoading) {
-      return const Center(child: CircularProgressIndicator(color: Colors.red));
+      return const Center(child: CircularProgressIndicator(color: AppTheme.camimRed));
     }
 
     if (list == null || list.isEmpty) {
@@ -173,11 +177,11 @@ class _RankingScreenState extends State<RankingScreen> with SingleTickerProvider
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.sports_motorsports_outlined, size: 64, color: Colors.grey[300]),
+            const Icon(Icons.sports_motorsports_outlined, size: 64, color: Colors.white24),
             const SizedBox(height: 16),
             Text(
-              _searchController.text.isEmpty ? 'No hay datos en esta categoría' : 'No se encontraron resultados', 
-              style: TextStyle(color: Colors.grey[500], fontSize: 15, fontWeight: FontWeight.w500)
+              _searchController.text.isEmpty ? 'SIN DATOS CARGADOS' : 'NO HAY RESULTADOS', 
+              style: AppTheme.dataFont(color: Colors.white54, fontSize: 12)
             ),
           ],
         ),
@@ -185,6 +189,8 @@ class _RankingScreenState extends State<RankingScreen> with SingleTickerProvider
     }
 
     return RefreshIndicator(
+      color: AppTheme.camimRed,
+      backgroundColor: AppTheme.camimAsh,
       onRefresh: () async {
         _rankingsByCat.remove(category);
         await _loadRankingsForCategory(category);
@@ -216,134 +222,106 @@ class _RankingRow extends StatelessWidget {
     
     Color posColor;
     switch (pos) {
-      case 1: posColor = const Color(0xFFFFD700); break;
-      case 2: posColor = const Color(0xFFC0C0C0); break;
-      case 3: posColor = const Color(0xFFCD7F32); break;
-      default: posColor = Colors.grey[300]!;
+      case 1: posColor = const Color(0xFFD4AF37); break; // Gold
+      case 2: posColor = const Color(0xFFC0C0C0); break; // Silver
+      case 3: posColor = const Color(0xFFCD7F32); break; // Bronze
+      default: posColor = Colors.transparent;
     }
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 12, offset: const Offset(0, 4))
-        ],
+        color: AppTheme.camimAsh,
+        border: Border.all(color: pos == 1 ? posColor : Colors.white12, width: pos == 1 ? 2 : 1),
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: IntrinsicHeight(
-          child: Row(
-            children: [
-              // Indicador de posición lateral
-              Container(
-                width: 6,
-                color: isTop3 ? posColor : Colors.transparent,
+      child: IntrinsicHeight(
+        child: Row(
+          children: [
+            // Indicador de posición
+            Container(
+              width: 44,
+              color: isTop3 ? posColor.withOpacity(0.1) : Colors.transparent,
+              alignment: Alignment.center,
+              child: Text(
+                'P$pos', 
+                style: AppTheme.dataFont(
+                  fontSize: 16, 
+                  color: isTop3 ? posColor : Colors.white54,
+                )
               ),
-              const SizedBox(width: 12),
-              
-              // Número de posición
-              Container(
-                width: 32,
-                alignment: Alignment.center,
-                child: Text(
-                  '$pos', 
-                  style: TextStyle(
-                    fontWeight: FontWeight.w900, 
-                    fontSize: 18, 
-                    color: isTop3 ? Colors.black : Colors.grey[400],
-                    fontStyle: FontStyle.italic
-                  )
-                ),
-              ),
-              
-              const SizedBox(width: 8),
-              
-              // Foto
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: isTop3 ? posColor : Colors.grey[100]!, width: 2),
-                  ),
-                  child: CircleAvatar(
-                    radius: 22,
-                    backgroundColor: Colors.grey[50],
-                    backgroundImage: pilot['photo_url'] != null ? NetworkImage(pilot['photo_url']) : null,
-                    child: pilot['photo_url'] == null ? Icon(Icons.person, color: Colors.grey[300], size: 24) : null,
-                  ),
-                ),
-              ),
-              
-              const SizedBox(width: 16),
-              
-              // Info del Piloto
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _formatName(pilot['pilot_name'] ?? 'Piloto'),
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 2),
-                    Row(
-                      children: [
-                        Text(
-                          'MOTO #${pilot['moto_number'] ?? '-'}',
-                          style: TextStyle(color: Colors.grey[500], fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 0.5),
-                        ),
-                        if (lastPoints > 0) ...[
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                            decoration: BoxDecoration(color: Colors.green[50], borderRadius: BorderRadius.circular(4)),
-                            child: Text(
-                              '+$lastPoints esta fecha',
-                              style: const TextStyle(color: Colors.green, fontSize: 9, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              
-              // Puntos Totales
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+            ),
+            
+            Container(width: 1, color: isTop3 ? posColor.withOpacity(0.3) : Colors.white12),
+            
+            // Foto
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              child: Container(
+                width: 40, height: 40,
                 decoration: BoxDecoration(
-                  color: Colors.grey[50],
+                  color: AppTheme.camimInk,
+                  border: Border.all(color: isTop3 ? posColor : Colors.white12),
+                  image: pilot['photo_url'] != null ? DecorationImage(image: NetworkImage(pilot['photo_url']), fit: BoxFit.cover) : null,
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      '${pilot['points'] ?? 0}',
-                      style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: Colors.black),
-                    ),
-                    const Text('PTS', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: Colors.grey, letterSpacing: 1)),
-                  ],
-                ),
+                child: pilot['photo_url'] == null ? const Icon(Icons.person, color: Colors.white24, size: 20) : null,
               ),
-            ],
-          ),
+            ),
+            
+            // Info del Piloto
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    (pilot['pilot_name'] ?? 'PILOTO').toString().toUpperCase(),
+                    style: AppTheme.displayFont(fontSize: 18, color: Colors.white).copyWith(height: 1),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        color: Colors.white10,
+                        child: Text(
+                          '#${pilot['moto_number'] ?? '-'}',
+                          style: AppTheme.dataFont(color: Colors.white, fontSize: 10),
+                        ),
+                      ),
+                      if (lastPoints > 0) ...[
+                        const SizedBox(width: 8),
+                        Text(
+                          '+$lastPoints PTS',
+                          style: AppTheme.dataFont(color: Colors.greenAccent, fontSize: 10),
+                        ),
+                      ],
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            
+            // Puntos Totales
+            Container(
+              width: 70,
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              color: AppTheme.camimInk,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    '${pilot['points'] ?? 0}',
+                    style: AppTheme.dataFont(fontSize: 20, color: AppTheme.camimRed),
+                  ),
+                  Text('TOTAL', style: AppTheme.dataFont(fontSize: 9, color: Colors.white54)),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
-  }
-
-  String _formatName(String text) {
-    if (text.isEmpty) return text;
-    return text.split(' ').map((str) {
-      if (str.isEmpty) return str;
-      return str[0].toUpperCase() + str.substring(1).toLowerCase();
-    }).join(' ');
   }
 }
