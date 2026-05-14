@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../theme/app_theme.dart';
 
 class GuestTicketScreen extends StatefulWidget {
@@ -82,12 +83,26 @@ class _GuestTicketScreenState extends State<GuestTicketScreen> {
 
     setState(() => _isLoading = true);
     
-    // Simulación de llamado a AstroPay
-    await Future.delayed(const Duration(seconds: 2));
+    final Uri paymentUrl = Uri.parse('https://onetouch.astropay.com/payment?external_reference_id=MHAokkAVEoTh8MAr0311of4Gp19qicZe');
     
-    if (mounted) {
-      setState(() => _isLoading = false);
-      _showWinkDialog();
+    try {
+      if (!await launchUrl(paymentUrl, mode: LaunchMode.externalApplication)) {
+        throw 'No se pudo abrir el link de pago';
+      }
+      // Mostrar el diálogo de éxito / aviso
+      if (mounted) {
+        _showWinkDialog();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: AppTheme.camimRed),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -158,7 +173,7 @@ class _GuestTicketScreenState extends State<GuestTicketScreen> {
                 ),
                 child: _isLoading 
                   ? const CircularProgressIndicator(color: Colors.white)
-                  : Text('PAGAR CON ASTROPAY', style: AppTheme.dataFont(color: Colors.white, fontSize: 16)),
+                  : Text('COMPRAR ENTRADA', style: AppTheme.dataFont(color: Colors.white, fontSize: 16)),
               ),
             ),
           ],
