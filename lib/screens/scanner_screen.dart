@@ -141,11 +141,36 @@ class _ScannerScreenState extends State<ScannerScreen> {
               Text('Fecha: $_eventName', style: const TextStyle(fontSize: 12, color: Colors.green)),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.flip_camera_ios, color: Colors.white),
+            onPressed: () => cameraController.switchCamera(),
+          ),
+        ],
       ),
       body: Stack(
         children: [
           MobileScanner(
             controller: cameraController,
+            errorBuilder: (context, error, child) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(30.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.videocam_off, color: Colors.redAccent, size: 60),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Error al acceder a la cámara.\nPor favor, verifica que diste los permisos necesarios.',
+                        style: AppTheme.dataFont(color: Colors.white, fontSize: 16),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
             onDetect: (capture) {
               final List<Barcode> barcodes = capture.barcodes;
               for (final barcode in barcodes) {
