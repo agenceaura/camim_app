@@ -254,23 +254,55 @@ class _LoginScreenState extends State<LoginScreen> {
                     : Text('INICIAR SESIÓN', style: AppTheme.dataFont(fontSize: 14)),
               ),
               
-              const SizedBox(height: 20),
-              // Enlace resaltado para ir a registro
-              Center(
-                child: TextButton(
-                  onPressed: () => context.push('/register'),
-                  child: RichText(
-                    text: TextSpan(
-                      style: AppTheme.bodyFont(color: Colors.white70, fontSize: 14),
-                      children: const [
-                        TextSpan(text: '¿Aún no tienes cuenta? '),
-                        TextSpan(
-                          text: 'Regístrate aquí', 
-                          style: TextStyle(color: AppTheme.camimRed, fontWeight: FontWeight.bold)
+              const SizedBox(height: 32),
+
+              // CTA Registro — bloque prominente
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.white24, width: 1),
+                  color: AppTheme.camimAsh,
+                ),
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          '◆ ¿PRIMERA VEZ EN CAMIM?',
+                          style: AppTheme.dataFont(color: AppTheme.camimRed, fontSize: 10)
+                              .copyWith(letterSpacing: 2),
                         ),
                       ],
                     ),
-                  ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Creá tu cuenta como piloto, espectador o prensa.',
+                      style: AppTheme.bodyFont(color: Colors.white60, fontSize: 13),
+                    ),
+                    const SizedBox(height: 16),
+                    OutlinedButton(
+                      onPressed: () => context.push('/register'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        side: const BorderSide(color: Colors.white, width: 1.5),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: const ContinuousRectangleBorder(),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'CREAR CUENTA',
+                            style: AppTheme.dataFont(color: Colors.white, fontSize: 13)
+                                .copyWith(letterSpacing: 2),
+                          ),
+                          const SizedBox(width: 10),
+                          const Icon(Icons.arrow_forward, size: 16, color: Colors.white),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
