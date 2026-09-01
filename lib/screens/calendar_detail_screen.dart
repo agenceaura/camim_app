@@ -237,6 +237,20 @@ class _CalendarDetailScreenState extends State<CalendarDetailScreen> {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () => context.push('/guest_ticket'),
+                        icon: const Icon(Icons.confirmation_num, color: Colors.white),
+                        label: Text('COMPRAR ENTRADAS EN LÍNEA (\$8.000)', style: AppTheme.dataFont(color: Colors.white, fontSize: 12)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.camimRed,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                        ),
+                      ),
+                    ),
                     if (_isAdmin) ...[
                       const SizedBox(height: 12),
                       SizedBox(

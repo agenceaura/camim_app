@@ -422,6 +422,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 // Reemplazamos los rectángulos enormes por barras horizontales fluidas
                 Column(
                   children: [
+                    _SleekTile(icon: Icons.confirmation_num_outlined, title: 'COMPRAR ENTRADAS EN LÍNEA', highlight: true, onTap: () => context.push('/guest_ticket')),
                     _SleekTile(icon: Icons.article_outlined, title: 'REGLAMENTOS OFICIALES', onTap: () => context.push('/regulations')),
                     _SleekTile(icon: Icons.attach_money, title: 'COSTOS DE INSCRIPCIÓN', onTap: () => context.push('/costs')),
                     _SleekTile(icon: Icons.history, title: 'FECHAS Y RESULTADOS', onTap: () => context.push('/dates_history')),

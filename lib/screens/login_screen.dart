@@ -209,6 +209,20 @@ class _LoginScreenState extends State<LoginScreen> {
                         ],
                       ),
                     ),
+                    const SizedBox(height: 12),
+                    ElevatedButton.icon(
+                      onPressed: () => context.push('/guest_ticket'),
+                      icon: const Icon(Icons.confirmation_num, color: Colors.white, size: 18),
+                      label: Text(
+                        'COMPRAR ENTRADAS COMO ESPECTADOR',
+                        style: AppTheme.dataFont(color: Colors.white, fontSize: 11).copyWith(letterSpacing: 1),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.camimRed,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: const ContinuousRectangleBorder(),
+                      ),
+                    ),
                   ],
                 ),
               ),

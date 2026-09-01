@@ -103,9 +103,25 @@ INSERT INTO public.rankings (category, pilot_name, moto_number, points, last_poi
 ('Open Class', 'SANDRO DIAZ', 93, 18, 0),
 ('Open Class', 'CRISTIAN OJEDA', 23, 18, 0);
 
--- 3. Enlazar automáticamente los perfiles registrados con los nuevos rankings
+-- 3. Enlazar automáticamente los perfiles registrados con los nuevos rankings (Inteligente)
+-- Habilitamos la extensión de similitud de textos en Supabase (si no está activa)
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
 UPDATE public.rankings r
 SET profile_id = p.id
 FROM public.profiles p
-WHERE LOWER(TRIM(r.pilot_name)) = LOWER(TRIM(p.first_name || ' ' || p.last_name))
-   OR LOWER(TRIM(r.pilot_name)) = LOWER(TRIM(p.last_name || ' ' || p.first_name));
+WHERE 
+  -- A) Match exacto ignorando todo lo que no sea letras (ej. espacios extras, guiones)
+  REGEXP_REPLACE(LOWER(r.pilot_name), '[^a-záéíóúñ]', '', 'g') = REGEXP_REPLACE(LOWER(p.first_name || p.last_name), '[^a-záéíóúñ]', '', 'g')
+  OR 
+  REGEXP_REPLACE(LOWER(r.pilot_name), '[^a-záéíóúñ]', '', 'g') = REGEXP_REPLACE(LOWER(p.last_name || p.first_name), '[^a-záéíóúñ]', '', 'g')
+  
+  -- B) Match aproximado (fuzzy) para detectar errores de tipeo (ej. Luighi vs Luigi) o números colados
+  OR similarity(
+       TRIM(REGEXP_REPLACE(LOWER(r.pilot_name), '[0-9]', '', 'g')),
+       TRIM(REGEXP_REPLACE(LOWER(p.first_name || ' ' || p.last_name), '[0-9]', '', 'g'))
+     ) > 0.5
+  OR similarity(
+       TRIM(REGEXP_REPLACE(LOWER(r.pilot_name), '[0-9]', '', 'g')),
+       TRIM(REGEXP_REPLACE(LOWER(p.last_name || ' ' || p.first_name), '[0-9]', '', 'g'))
+     ) > 0.5;

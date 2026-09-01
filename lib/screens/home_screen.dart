@@ -290,14 +290,28 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   child: Column(
                     children: [
-                      const Icon(Icons.confirmation_num_outlined, size: 48, color: Colors.white54),
+                      const Icon(Icons.confirmation_num_outlined, size: 48, color: AppTheme.camimRed),
                       const SizedBox(height: 16),
                       Text('ACCESO ESPECTADOR', style: AppTheme.subheadFont(color: Colors.white, fontSize: 24)),
                       const SizedBox(height: 8),
                       Text(
-                        'Compra tus entradas en puerta y sigue los tiempos en vivo desde esta app.', 
+                        'Comprá tus entradas online o en puerta y seguí los tiempos en vivo desde esta app.', 
                         textAlign: TextAlign.center,
                         style: AppTheme.bodyFont(color: Colors.white70),
+                      ),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: () => context.push('/guest_ticket'),
+                          icon: const Icon(Icons.confirmation_num, color: Colors.white),
+                          label: Text('COMPRAR ENTRADA ONLINE', style: AppTheme.dataFont(color: Colors.white, fontSize: 13)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.camimRed,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                          ),
+                        ),
                       ),
                     ]
                   )
